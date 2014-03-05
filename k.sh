@@ -1,6 +1,11 @@
 # new k
 k () {
-  stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" -t "%D" . .. .* *
+  filesArr=(. .. .* *)
+
+  #arr=(stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" -t "%D" . .. .* *)
+  for i in $filesArr
+    do stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" -t "%D" $i
+  done
 }
 
 
