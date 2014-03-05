@@ -20,6 +20,6 @@ source ~/.zshrc
 ```
 hit k
 ```bash
-source ~/.zshrc
+k
 ```
 profit
