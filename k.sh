@@ -1,6 +1,6 @@
 # new k
 k () {
-  stat -f "%Sp %l %Su %Sg %Z %m %N %Y" . .. .* *;
+  stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" . .. .* *
 }
 
 
