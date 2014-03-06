@@ -1,12 +1,56 @@
 # new k
 k () {
-  filesArr=(. .. .* *)
 
-  #arr=(stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" -t "%D" . .. .* *)
-  for i in $filesArr
-    do stat -f "%Sp %l %Su %Sg %Z %Sm %N %Y" -t "%D" $i
+  # git --git-dir=`pwd`/.git --work-tree=`pwd` rev-parse --is-inside-work-tree &>/dev/null || return
+
+  # filesArr=(. .. .* *) | ehite
+
+  # stat -f "%Sp %l %Su %Sg %Z %Sm | %N %Y" -t "%D" $i
+
+  # cd $1 && git rev-parse --is-inside-work-tree &>/dev/null || return && cd $owd
+
+  # for i in $filesArr
+    # do
+    # repoMarker=''
+    # if true #git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 rev-parse --is-inside-work-tree  &>/dev/null
+    #   then repoMarker='*'
+    #   if true #git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 diff --quiet --ignore-submodules HEAD &>/dev/null
+    #     then repoMarker='&'
+    #     fi
+    # fi
+    # stat -f "%Sp %l %Su %Sg %Z %Sm $repoMarker %N %Y" -t "%D" $i
+  # done
+
+  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
+  do
+    # echo $RES
+    ARR=(${(s:~:)RES})
+    repoMarker=''
+    echo $ARR[1] | cut -c1
+    # if $ARR[1][1]
+    # if --git-dir=`pwd`/$ARR[7]/.git
+    #   then repoMarker='*'
+    #   if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null
+    #     then repoMarker='&'
+    #     fi
+    # fi
+    # echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] '\033[31;0m'$ARR[6]'\033[0m' '\033[0;34m'$ARR[7]'\033[0m'
   done
+
+
+
 }
+
+# git_dirty() {
+#     # Check if we're in a git repo
+#     command git rev-parse --is-inside-work-tree &>/dev/null || return
+#     # Check if it's dirty
+#     command git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo "*"
+# }
+
+
+
+
 
 
 # old k, suck old features from here before deleting
