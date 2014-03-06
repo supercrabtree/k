@@ -1,6 +1,53 @@
 # new k
 k () {
 
+
+  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
+  do
+    # create array from results by splitting on ~
+    # 1: permissions
+    # 2: num of sym links pointing to this file
+    # 3: owner
+    # 4: group
+    # 5: filesize in bytes
+    # 6: date last modified
+    # 7: name
+    ARR=(${(s:~:)RES})
+
+    REPOMARKER=" "
+
+    if [[ -d $ARR[7] ]] # if a directory
+      then
+      if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
+        then
+        if git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
+          then REPOMARKER="\033[0;31m*\033[0m"
+          else REPOMARKER="\033[0;32m*\033[0m"
+        fi
+      fi
+    fi
+
+    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7]
+  done
+}
+
+
+
+
+
+    # if $ARR[1][1]
+    # if --git-dir=`pwd`/$ARR[7]/.git
+    #   then repoMarker='*'
+    #   if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null
+    #     then repoMarker='&'
+    #     fi
+    # fi
+    # echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] '\033[31;0m'$ARR[6]'\033[0m' '\033[0;34m'$ARR[7]'\033[0m'
+
+
+
+
+
   # git --git-dir=`pwd`/.git --work-tree=`pwd` rev-parse --is-inside-work-tree &>/dev/null || return
 
   # filesArr=(. .. .* *) | ehite
@@ -20,26 +67,6 @@ k () {
     # fi
     # stat -f "%Sp %l %Su %Sg %Z %Sm $repoMarker %N %Y" -t "%D" $i
   # done
-
-  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
-  do
-    # echo $RES
-    ARR=(${(s:~:)RES})
-    repoMarker=''
-    echo $ARR[1] | cut -c1
-    # if $ARR[1][1]
-    # if --git-dir=`pwd`/$ARR[7]/.git
-    #   then repoMarker='*'
-    #   if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null
-    #     then repoMarker='&'
-    #     fi
-    # fi
-    # echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] '\033[31;0m'$ARR[6]'\033[0m' '\033[0;34m'$ARR[7]'\033[0m'
-  done
-
-
-
-}
 
 # git_dirty() {
 #     # Check if we're in a git repo
