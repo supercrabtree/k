@@ -20,9 +20,9 @@ k () {
       then
       if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
         then
-        if git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
-          then REPOMARKER="\033[0;31m*\033[0m"
-          else REPOMARKER="\033[0;32m*\033[0m"
+        if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
+          then REPOMARKER="\033[0;32m*\033[0m"
+          else REPOMARKER="\033[0;31m*\033[0m"
         fi
       fi
     fi
