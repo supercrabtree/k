@@ -52,12 +52,11 @@ k () {
     while [[ $#ARR[4] -lt $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
     while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
-
-    # this works but is slow
-    # ARR[1]=$(echo "$ARR[1]" | sed 's/^\(d\)/\\033[1;36m\1\\033[0m/')
     
     # oh zing!
     # ARR[1]=${ARR[1]//d/"\033[1;36md\033[0m"}
+
+    # https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html
 
     # type
     T=$ARR[1]
@@ -78,7 +77,13 @@ k () {
     PER3=$ARR[1]
     PER3=$PER3[8,10]
 
-    echo $T$PER1$PER2$PER3 $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+    PERMISSIONS=$T$PER1$PER2$PER3
+
+    # 777 warning
+    P=$ARR[1]
+    if [[ $P[2,10] == "rwxrwxrwx" ]]; then PERMISSIONS="\033[30;41m$ARR[1]\033[0m"; fi
+
+    echo $PERMISSIONS $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
 }
 
