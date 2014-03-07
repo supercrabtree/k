@@ -57,9 +57,28 @@ k () {
     # ARR[1]=$(echo "$ARR[1]" | sed 's/^\(d\)/\\033[1;36m\1\\033[0m/')
     
     # oh zing!
-    ARR[1]=${ARR[1]//d/"\033[1;36md\033[0m"}
+    # ARR[1]=${ARR[1]//d/"\033[1;36md\033[0m"}
 
-    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+    # type
+    T=$ARR[1]
+    T=$T[1]
+    if [[ $T == "d" ]]; then T=${T//d/"\033[1;36md\033[0m"}; fi
+    if [[ $T == "l" ]]; then T=${T//l/"\033[0;35ml\033[0m"}; fi
+    if [[ $T == "-" ]]; then T=${T//-/"\033[0;37m-\033[0m"}; fi
+
+    # permissions 1
+    PER1=$ARR[1]
+    PER1=$PER1[2,4]
+
+    # permissions 2
+    PER2=$ARR[1]
+    PER2=$PER2[5,7]
+
+    # permissions 3
+    PER3=$ARR[1]
+    PER3=$PER3[8,10]
+
+    echo $T$PER1$PER2$PER3 $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
 }
 
