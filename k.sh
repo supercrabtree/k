@@ -83,7 +83,7 @@ k () {
     P=$ARR[1]
     if [[ $P[2,10] == "rwxrwxrwx" ]]; then PERMISSIONS="\033[30;41m$ARR[1]\033[0m"; fi
 
-    echo $PERMISSIONS $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+    echo $PERMISSIONS " "$ARR[2] $ARR[3] " "$ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
 }
 
