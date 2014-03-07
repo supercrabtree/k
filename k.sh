@@ -1,8 +1,18 @@
 # new k
 k () {
-
-
+  MAX_LEN=(0 0 0 0 0 0)
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
+  do
+    A=(${(s:~:)RES})
+    if [[ $#A[1] > $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
+    if [[ $#A[2] > $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
+    if [[ $#A[3] > $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
+    if [[ $#A[4] > $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
+    if [[ $#A[5] > $MAX_LEN[5] ]]; then MAX_LEN[5]=$#A[5]; fi;
+    if [[ $#A[6] > $MAX_LEN[6] ]]; then MAX_LEN[6]=$#A[6]; fi;
+  done
+
+  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES2
   do
     # create array from results by splitting on ~
     # 1: permissions
@@ -12,7 +22,7 @@ k () {
     # 5: filesize in bytes
     # 6: date last modified
     # 7: name
-    ARR=(${(s:~:)RES})
+    ARR=(${(s:~:)RES2})
 
     REPOMARKER=" "
 
@@ -21,14 +31,20 @@ k () {
       if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
         then
         if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
-          then REPOMARKER="\033[0;32m*\033[0m"
-          else REPOMARKER="\033[0;31m*\033[0m"
+          then REPOMARKER="\033[0;32m|\033[0m"
+          else REPOMARKER="\033[0;31m|\033[0m"
         fi
       fi
+      ARR[7]="\033[0;36m"$ARR[7]"\033[0m"
     fi
 
-    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7]
+    if [[ ! -z $ARR[8] ]]
+      then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
+    fi
+    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
+
+  echo $MAX_LEN
 }
 
 
