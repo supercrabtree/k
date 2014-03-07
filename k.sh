@@ -35,7 +35,7 @@ k () {
           else REPOMARKER="\033[0;31m|\033[0m"
         fi
       fi
-      ARR[7]="\033[0;36m"$ARR[7]"\033[0m"
+      ARR[7]="\033[0;34m"$ARR[7]"\033[0m"
     fi
 
     if [[ ! -z $ARR[8] ]]
