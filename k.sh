@@ -41,10 +41,16 @@ k () {
     if [[ ! -z $ARR[8] ]]
       then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
     fi
-    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
-  done
 
-  echo $MAX_LEN
+    while [[ $#ARR[1] < $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
+    while [[ $#ARR[2] < $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
+    while [[ $#ARR[3] < $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
+    while [[ $#ARR[4] < $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
+    while [[ $#ARR[5] < $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
+    while [[ $#ARR[6] < $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
+
+    echo $ARR[1] " "$ARR[2] $ARR[3] $ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+  done
 }
 
 
