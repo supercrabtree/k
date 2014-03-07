@@ -31,7 +31,7 @@ k () {
       if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
         then
         if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
-          then REPOMARKER="\033[0;32m|\033[0m"
+          then REPOMARKER="\033[0;90m|\033[0m"
           else REPOMARKER="\033[0;31m|\033[0m"
         fi
       fi
@@ -49,7 +49,7 @@ k () {
     while [[ $#ARR[5] < $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] < $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
 
-    echo $ARR[1] " "$ARR[2] $ARR[3] $ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+    echo $ARR[1] " "$ARR[2] "\033[0;90m"$ARR[3] $ARR[4]"\033[0m" $ARR[5] "\033[0;90m"$ARR[6]"\033[0m" $REPOMARKER $ARR[7] $ARR[8]
   done
 }
 
