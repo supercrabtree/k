@@ -4,12 +4,12 @@ k () {
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
   do
     A=(${(s:~:)RES})
-    if [[ $#A[1] > $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
-    if [[ $#A[2] > $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
-    if [[ $#A[3] > $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
-    if [[ $#A[4] > $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
-    if [[ $#A[5] > $MAX_LEN[5] ]]; then MAX_LEN[5]=$#A[5]; fi;
-    if [[ $#A[6] > $MAX_LEN[6] ]]; then MAX_LEN[6]=$#A[6]; fi;
+    if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
+    if [[ $#A[2] -ge $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
+    if [[ $#A[3] -ge $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
+    if [[ $#A[4] -ge $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
+    if [[ $#A[5] -ge $MAX_LEN[5] ]]; then MAX_LEN[5]=$#A[5]; fi;
+    if [[ $#A[6] -ge $MAX_LEN[6] ]]; then MAX_LEN[6]=$#A[6]; fi;
   done
 
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES2
@@ -30,7 +30,7 @@ k () {
       then
       if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
         then
-        if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
+        if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
           then REPOMARKER="\033[0;32m|\033[0m"
           else REPOMARKER="\033[0;31m|\033[0m"
         fi
@@ -43,16 +43,16 @@ k () {
       # color symblink
       then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
     fi
-
+    # echo $#ARR[3] 
     # pad so they align
-    while [[ $#ARR[1] < $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
-    while [[ $#ARR[2] < $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
-    while [[ $#ARR[3] < $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
-    while [[ $#ARR[4] < $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
-    while [[ $#ARR[5] < $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
-    while [[ $#ARR[6] < $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
+    while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
+    while [[ $#ARR[2] -lt $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
+    while [[ $#ARR[3] -lt $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
+    while [[ $#ARR[4] -lt $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
+    while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
+    while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
 
-    echo $ARR[1] " "$ARR[2] "\033[0;90m"$ARR[3] $ARR[4]"\033[0m" $ARR[5] "\033[0;90m"$ARR[6]"\033[0m" $REPOMARKER $ARR[7] $ARR[8]
+    echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
 }
 
