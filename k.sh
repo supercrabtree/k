@@ -4,7 +4,8 @@ k () {
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
   do
     A=(${(s:~:)RES})
-    if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
+    # dont need to pad the first line
+    # if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
     if [[ $#A[2] -ge $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
     if [[ $#A[3] -ge $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
     if [[ $#A[4] -ge $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
@@ -24,7 +25,7 @@ k () {
     # 7: name
     ARR=(${(s:~:)RES2})
 
-    REPOMARKER=" "
+    REPOMARKER=" "  
 
     if [[ -d $ARR[7] ]] # if a directory
       then
@@ -43,14 +44,20 @@ k () {
       # color symblink
       then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
     fi
-    # echo $#ARR[3] 
     # pad so they align
-    while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
+    # dont need to pad the first line ?
+    # while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
     while [[ $#ARR[2] -lt $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
     while [[ $#ARR[3] -lt $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
     while [[ $#ARR[4] -lt $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
     while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
+
+    # this works but is slow
+    # ARR[1]=$(echo "$ARR[1]" | sed 's/^\(d\)/\\033[1;36m\1\\033[0m/')
+    
+    # oh zing!
+    ARR[1]=${ARR[1]//d/"\033[1;36md\033[0m"}
 
     echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
