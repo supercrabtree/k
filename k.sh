@@ -31,17 +31,20 @@ k () {
       if [[ -d $ARR[7]"/.git" ]] # if contains a git folder
         then
         if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty (not working)
-          then REPOMARKER="\033[0;90m|\033[0m"
+          then REPOMARKER="\033[0;32m|\033[0m"
           else REPOMARKER="\033[0;31m|\033[0m"
         fi
       fi
-      ARR[7]="\033[0;34m"$ARR[7]"\033[0m"
+      # color directory
+      ARR[7]="\033[1;36m"$ARR[7]"\033[0m"
     fi
 
     if [[ ! -z $ARR[8] ]]
+      # color symblink
       then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
     fi
 
+    # pad so they align
     while [[ $#ARR[1] < $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
     while [[ $#ARR[2] < $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
     while [[ $#ARR[3] < $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
