@@ -1,11 +1,10 @@
 # new k
 k () {
-  MAX_LEN=(0 0 0 0 0 0)
+  MAX_LEN=(0 0 0 0 0 0) 
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
   do
     A=(${(s:~:)RES})
-    # dont need to pad the first line
-    # if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
+    if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
     if [[ $#A[2] -ge $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
     if [[ $#A[3] -ge $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
     if [[ $#A[4] -ge $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
@@ -44,20 +43,15 @@ k () {
       # color symblink
       then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
     fi
-    # pad so they align
-    # dont need to pad the first line ?
-    # while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=" "$ARR[1]; done;
+    # pad so they align - firstline gets padded the other way
+    while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=$ARR[1]" "; done;
     while [[ $#ARR[2] -lt $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
     while [[ $#ARR[3] -lt $MAX_LEN[3] ]]; do ARR[3]=" "$ARR[3]; done;
     while [[ $#ARR[4] -lt $MAX_LEN[4] ]]; do ARR[4]=" "$ARR[4]; done;
     while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
-    
-    # oh zing!
-    # ARR[1]=${ARR[1]//d/"\033[1;36md\033[0m"}
 
-    # https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html
-
+    # https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html // useful
     # type
     T=$ARR[1]
     T=$T[1]
@@ -78,51 +72,30 @@ k () {
     PER3=$PER3[8,10]
 
     PERMISSIONS=$T$PER1$PER2$PER3
-
-    # 777 warning
-    P=$ARR[1]
-    if [[ $P[2,10] == "rwxrwxrwx" ]]; then PERMISSIONS="\033[30;41m$ARR[1]\033[0m"; fi
+    
+    # --7 warning
+    if [[ $PER3 == "rwx" ]]; then PERMISSIONS="\033[30;41m$ARR[1]\033[0m"; fi
+    
+    # color file weights
+    # GREEN_TO_RED=(46 82 118 154 190 226 220 214 208 202 196)
+    S=(7) # cant get int to work somehow?
+      if [[ $ARR[5] -le 1024 ]];    then S[1]=46;    # <= 1kb
+    elif [[ $ARR[5] -le 2048 ]];    then S[1]=82;    # <= 2kb  
+    elif [[ $ARR[5] -le 3072 ]];    then S[1]=118;   # <= 3kb  
+    elif [[ $ARR[5] -le 5120 ]];    then S[1]=154;   # <= 5kb  
+    elif [[ $ARR[5] -le 10240 ]];   then S[1]=190;   # <= 10kb  
+    elif [[ $ARR[5] -le 20480 ]];   then S[1]=226;   # <= 20kb  
+    elif [[ $ARR[5] -le 40960 ]];   then S[1]=220;   # <= 40kb  
+    elif [[ $ARR[5] -le 102400 ]];  then S[1]=214;   # <= 100kb
+    elif [[ $ARR[5] -le 262144 ]];  then S[1]=208;   # <= 0.25mb ]] 256kb
+    elif [[ $ARR[5] -le 524288 ]];  then S[1]=202;   # <= 0.5mb || 512kb
+    else                                 S[1]=196;   # >= 0.5mb || 512kb
+    fi;
+    ARR[5]="\033[38;5;$S[1]m$ARR[5]\033[0m"
 
     echo $PERMISSIONS " "$ARR[2] $ARR[3] " "$ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
 }
-
-
-
-
-
-    # if $ARR[1][1]
-    # if --git-dir=`pwd`/$ARR[7]/.git
-    #   then repoMarker='*'
-    #   if git --git-dir=`pwd`/$ARR[7]/.git --work-tree=`pwd`/$ARR[7] diff --quiet --ignore-submodules HEAD &>/dev/null
-    #     then repoMarker='&'
-    #     fi
-    # fi
-    # echo $ARR[1] $ARR[2] $ARR[3] $ARR[4] $ARR[5] '\033[31;0m'$ARR[6]'\033[0m' '\033[0;34m'$ARR[7]'\033[0m'
-
-
-
-
-
-  # git --git-dir=`pwd`/.git --work-tree=`pwd` rev-parse --is-inside-work-tree &>/dev/null || return
-
-  # filesArr=(. .. .* *) | ehite
-
-  # stat -f "%Sp %l %Su %Sg %Z %Sm | %N %Y" -t "%D" $i
-
-  # cd $1 && git rev-parse --is-inside-work-tree &>/dev/null || return && cd $owd
-
-  # for i in $filesArr
-    # do
-    # repoMarker=''
-    # if true #git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 rev-parse --is-inside-work-tree  &>/dev/null
-    #   then repoMarker='*'
-    #   if true #git --git-dir=`pwd`/$i/.git --work-tree=`pwd`/$1 diff --quiet --ignore-submodules HEAD &>/dev/null
-    #     then repoMarker='&'
-    #     fi
-    # fi
-    # stat -f "%Sp %l %Su %Sg %Z %Sm $repoMarker %N %Y" -t "%D" $i
-  # done
 
 # git_dirty() {
 #     # Check if we're in a git repo
@@ -130,53 +103,3 @@ k () {
 #     # Check if it's dirty
 #     command git diff --quiet --ignore-submodules HEAD &>/dev/null; [ $? -eq 1 ] && echo "*"
 # }
-
-
-
-
-
-
-# old k, suck old features from here before deleting
-kk() {
-  GREEN_TO_RED=(46 82 118 154 190 226 220 214 208 202 196)
-  # ls with file sizes highlighted
-  # echo " $( script -q /dev/null ls -laG | sed 's/^\([^ ]*[ ]*\)\([^ ]*[ ]*\)\([^ ]*[ ]*\)\([^ ]*\)\([ ]*[0-9]*\)/\1\2\3\4\\033[41m\5\\033[0m/' ) "
-
-  # Get all the file sizes from a ls call (i know this is bad, but i dont know any better)
-  FILESIZES="$(script -q /dev/null ls -laG | sed 's/^\([^ ]*[ ]*\)\([^ ]*[ ]*\)\([^ ]*[ ]*\)\([^ ]*\)\([ ]*[0-9]*\)\(.*\)/\5/')"
-  # Split them into array on linebreaks
-  SIZE_ARRAY=("${(@f)FILESIZES}")
-
-  # Get all the results from a ls call
-  LSRESULTS="$(script -q /dev/null ls -laG)"
-  # Split them into array on linebreaks
-  LSRESULT_ARRAY=("${(@f)LSRESULTS}")
-
-  # make them unique
-  SIZE_UNIQ=(${(u)SIZE_ARRAY})
-  SIZE_UNIQ_SORTED=(${(o)SIZE_UNIQ})
-
-  # get the lowest filesize
-  LOWEST=$SIZE_UNIQ_SORTED[1]
-
-  # get the highest filesize
-  HIGHEST=$SIZE_UNIQ_SORTED[$#SIZE_UNIQ_SORTED]
-
-  # get the difference between the highest and lowest filesizes
-  DIFF=$(($HIGHEST-$LOWEST))
-
-  STEP=$(($DIFF/11.0))
-
-  echo $(($DIFF/$STEP))
-
-  # echo $DIFF $LOWEST
-
-  # for ((i = 1; i <= $#SIZE_UNIQ_SORTED; i++))
-    # do echo $(($SIZE_UNIQ_SORTED[$i] - $LOWEST))
-  # done
-
-  # ((JUMP=11.0 / #SIZE_UNIQ_SORTED))
-  # for ((i = 1; i <= $#SIZE_UNIQ_SORTED; i++))
-  #   do echo $i $((int($i * $JUMP))) "\t" $SIZE_UNIQ_SORTED[$i]
-  # done
-}
