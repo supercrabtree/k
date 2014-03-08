@@ -2,7 +2,7 @@
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
 # new k
 k () {
-  EPOCH=`date +%s`
+  EPOCH=`date -j +%s`
   MAX_LEN=(0 0 0 0 0 0)
 
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%s" . .. .* * | while read RES
@@ -39,14 +39,8 @@ k () {
           else REPOMARKER="\033[0;31m|\033[0m"
         fi
       fi
-      # color directory
-      ARR[7]="\033[1;36m"$ARR[7]"\033[0m"
     fi
 
-    if [[ ! -z $ARR[8] ]]
-      # color symblink
-      then ARR[7]="\033[0;35m"$ARR[7]"\033[0m ->"
-    fi
     # pad so they align - firstline gets padded the other way
     while [[ $#ARR[1] -lt $MAX_LEN[1] ]]; do ARR[1]=$ARR[1]" "; done;
     while [[ $#ARR[2] -lt $MAX_LEN[2] ]]; do ARR[2]=" "$ARR[2]; done;
@@ -55,11 +49,19 @@ k () {
     while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
 
+    ITEM=$ARR[7]
+
     # type
     T=$ARR[1]
     T=$T[1]
-    if [[ $T == "d" ]]; then T=${T//d/"\033[1;36md\033[0m"}; fi
-    if [[ $T == "l" ]]; then T=${T//l/"\033[0;35ml\033[0m"}; fi
+    if [[ $T == "d" ]]; then
+      T=${T//d/"\033[1;36md\033[0m"};
+      ITEM="\033[1;36m"$ARR[7]"\033[0m"
+    fi
+    if [[ $T == "l" ]]; then
+      T=${T//l/"\033[0;35ml\033[0m"};
+      ITEM="\033[0;35m"$ARR[7]"\033[0m ->"
+    fi
     if [[ $T == "-" ]]; then T=${T//-/"\033[0;37m-\033[0m"}; fi
 
     # permissions 1
@@ -111,9 +113,24 @@ k () {
     elif [[ $TIMEDIFF -lt 62899200 ]]; then S5[1]=244;   # < less than 2 years old
     else                                    S5[1]=143;   # > more than 2 years old
     fi;
-    ARR[6]="\033[38;5;$S5[1]m$ARR[6]\033[0m"
+    # ARR[6]="\033[38;5;$S5[1]m$ARR[6]\033[0m"
+    # slow
+    if [[ $TIMEDIFF -lt 15724800 ]]; then
+      DATE="$(stat -f "%Sm" -t "%d %b %H:%M" $ARR[7])"
+      DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
+      DATE="\033[38;5;$S5[1]m$DATE\033[0m"
+      else
+      DATE="$(stat -f "%Sm" -t "%d %b  %Y" $ARR[7])"
+      DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
+      DATE="\033[38;5;$S5[1]m$DATE\033[0m"
+    fi
 
-    echo $PERMISSIONS " "$ARR[2] $ARR[3] " "$ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
+    # here is answer, http://stackoverflow.com/questions/11188621/how-can-i-convert-seconds-since-the-epoch-to-hours-minutes-seconds-in-java/11197532#11197532
+
+    # slow
+    # DATE=$(date -r $ARR[6])
+    # DATE=$ARR[6]
+    echo $PERMISSIONS " "$ARR[2] $ARR[3] " "$ARR[4] " "$ARR[5] $DATE $REPOMARKER $ITEM $ARR[8]
   done
 }
 
