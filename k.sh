@@ -1,7 +1,9 @@
 # new k
 k () {
+  EPOCH=`date +%s`
   MAX_LEN=(0 0 0 0 0 0)
-  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
+
+  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%s" . .. .* * | while read RES
   do
     A=(${(s:~:)RES})
     if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
@@ -12,7 +14,7 @@ k () {
     if [[ $#A[6] -ge $MAX_LEN[6] ]]; then MAX_LEN[6]=$#A[6]; fi;
   done
 
-  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES2
+  stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%s" . .. .* * | while read RES2
   do
     # create array from results by splitting on ~
     # 1: permissions
@@ -92,6 +94,23 @@ k () {
     else                                 S[1]=196;   # >= 0.5mb || 512kb
     fi;
     ARR[5]="\033[38;5;$S[1]m$ARR[5]\033[0m"
+
+    # fade older times
+    S5=(7)
+    TIMEDIFF=$(($EPOCH-$ARR[6]))
+      if [[ $TIMEDIFF -lt 0 ]];        then S5[1]=196;   # < in the future, #spooky
+    elif [[ $TIMEDIFF -lt 60 ]];       then S5[1]=252;   # < less than a min old
+    elif [[ $TIMEDIFF -lt 3600 ]];     then S5[1]=251;   # < less than an hour old
+    elif [[ $TIMEDIFF -lt 43200 ]];    then S5[1]=250;   # < less than 12 hours old
+    elif [[ $TIMEDIFF -lt 86400 ]];    then S5[1]=249;   # < less than 1 day old
+    elif [[ $TIMEDIFF -lt 604800 ]];   then S5[1]=248;   # < less than 1 week old
+    elif [[ $TIMEDIFF -lt 2419200 ]];  then S5[1]=247;   # < less than 28 days (4 weeks) old
+    elif [[ $TIMEDIFF -lt 15724800 ]]; then S5[1]=246;   # < less than 26 weeks (6 months) old
+    elif [[ $TIMEDIFF -lt 31449600 ]]; then S5[1]=245;   # < less than 1 year old
+    elif [[ $TIMEDIFF -lt 62899200 ]]; then S5[1]=244;   # < less than 2 years old
+    else                                    S5[1]=143;   # > more than 2 years old
+    fi;
+    ARR[6]="\033[38;5;$S5[1]m$ARR[6]\033[0m"
 
     echo $PERMISSIONS " "$ARR[2] $ARR[3] " "$ARR[4] " "$ARR[5] $ARR[6] $REPOMARKER $ARR[7] $ARR[8]
   done
