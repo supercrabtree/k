@@ -1,6 +1,6 @@
 # new k
 k () {
-  MAX_LEN=(0 0 0 0 0 0) 
+  MAX_LEN=(0 0 0 0 0 0)
   stat -f "%Sp~%l~%Su~%Sg~%Z~%Sm~%N~%Y" -t "%D" . .. .* * | while read RES
   do
     A=(${(s:~:)RES})
@@ -24,7 +24,7 @@ k () {
     # 7: name
     ARR=(${(s:~:)RES2})
 
-    REPOMARKER=" "  
+    REPOMARKER=" "
 
     if [[ -d $ARR[7] ]] # if a directory
       then
@@ -72,20 +72,20 @@ k () {
     PER3=$PER3[8,10]
 
     PERMISSIONS=$T$PER1$PER2$PER3
-    
+
     # --7 warning
     if [[ $PER3 == "rwx" ]]; then PERMISSIONS="\033[30;41m$ARR[1]\033[0m"; fi
-    
+
     # color file weights
     # GREEN_TO_RED=(46 82 118 154 190 226 220 214 208 202 196)
     S=(7) # cant get int to work somehow?
       if [[ $ARR[5] -le 1024 ]];    then S[1]=46;    # <= 1kb
-    elif [[ $ARR[5] -le 2048 ]];    then S[1]=82;    # <= 2kb  
-    elif [[ $ARR[5] -le 3072 ]];    then S[1]=118;   # <= 3kb  
-    elif [[ $ARR[5] -le 5120 ]];    then S[1]=154;   # <= 5kb  
-    elif [[ $ARR[5] -le 10240 ]];   then S[1]=190;   # <= 10kb  
-    elif [[ $ARR[5] -le 20480 ]];   then S[1]=226;   # <= 20kb  
-    elif [[ $ARR[5] -le 40960 ]];   then S[1]=220;   # <= 40kb  
+    elif [[ $ARR[5] -le 2048 ]];    then S[1]=82;    # <= 2kb
+    elif [[ $ARR[5] -le 3072 ]];    then S[1]=118;   # <= 3kb
+    elif [[ $ARR[5] -le 5120 ]];    then S[1]=154;   # <= 5kb
+    elif [[ $ARR[5] -le 10240 ]];   then S[1]=190;   # <= 10kb
+    elif [[ $ARR[5] -le 20480 ]];   then S[1]=226;   # <= 20kb
+    elif [[ $ARR[5] -le 40960 ]];   then S[1]=220;   # <= 40kb
     elif [[ $ARR[5] -le 102400 ]];  then S[1]=214;   # <= 100kb
     elif [[ $ARR[5] -le 262144 ]];  then S[1]=208;   # <= 0.25mb ]] 256kb
     elif [[ $ARR[5] -le 524288 ]];  then S[1]=202;   # <= 0.5mb || 512kb
