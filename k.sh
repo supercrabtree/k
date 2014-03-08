@@ -1,3 +1,5 @@
+# https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html // useful, can click links
+# http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
 # new k
 k () {
   EPOCH=`date +%s`
@@ -53,7 +55,6 @@ k () {
     while [[ $#ARR[5] -lt $MAX_LEN[5] ]]; do ARR[5]=" "$ARR[5]; done;
     while [[ $#ARR[6] -lt $MAX_LEN[6] ]]; do ARR[6]=" "$ARR[6]; done;
 
-    # https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html // useful
     # type
     T=$ARR[1]
     T=$T[1]
