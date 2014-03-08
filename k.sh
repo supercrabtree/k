@@ -117,13 +117,12 @@ k () {
     # slow
     if [[ $TIMEDIFF -lt 15724800 ]]; then
       DATE="$(stat -f "%Sm" -t "%d %b %H:%M" $ARR[7])"
-      DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
-      DATE="\033[38;5;$S5[1]m$DATE\033[0m"
       else
       DATE="$(stat -f "%Sm" -t "%d %b  %Y" $ARR[7])"
-      DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
-      DATE="\033[38;5;$S5[1]m$DATE\033[0m"
-    fi
+    fi;
+    # echo $S5
+    DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
+    DATE="\033[38;5;$S5[1]m$DATE\033[0m"
 
     # here is answer, http://stackoverflow.com/questions/11188621/how-can-i-convert-seconds-since-the-epoch-to-hours-minutes-seconds-in-java/11197532#11197532
 
