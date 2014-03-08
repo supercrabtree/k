@@ -103,15 +103,15 @@ k () {
     TIMEDIFF=$(($EPOCH-$ARR[6]))
       if [[ $TIMEDIFF -lt 0 ]];        then S5[1]=196;   # < in the future, #spooky
     elif [[ $TIMEDIFF -lt 60 ]];       then S5[1]=252;   # < less than a min old
-    elif [[ $TIMEDIFF -lt 3600 ]];     then S5[1]=251;   # < less than an hour old
-    elif [[ $TIMEDIFF -lt 43200 ]];    then S5[1]=250;   # < less than 12 hours old
-    elif [[ $TIMEDIFF -lt 86400 ]];    then S5[1]=249;   # < less than 1 day old
-    elif [[ $TIMEDIFF -lt 604800 ]];   then S5[1]=248;   # < less than 1 week old
-    elif [[ $TIMEDIFF -lt 2419200 ]];  then S5[1]=247;   # < less than 28 days (4 weeks) old
-    elif [[ $TIMEDIFF -lt 15724800 ]]; then S5[1]=246;   # < less than 26 weeks (6 months) old
-    elif [[ $TIMEDIFF -lt 31449600 ]]; then S5[1]=245;   # < less than 1 year old
-    elif [[ $TIMEDIFF -lt 62899200 ]]; then S5[1]=244;   # < less than 2 years old
-    else                                    S5[1]=143;   # > more than 2 years old
+    elif [[ $TIMEDIFF -lt 3600 ]];     then S5[1]=250;   # < less than an hour old
+    elif [[ $TIMEDIFF -lt 43200 ]];    then S5[1]=248;   # < less than 12 hours old
+    elif [[ $TIMEDIFF -lt 86400 ]];    then S5[1]=246;   # < less than 1 day old
+    elif [[ $TIMEDIFF -lt 604800 ]];   then S5[1]=244;   # < less than 1 week old
+    elif [[ $TIMEDIFF -lt 2419200 ]];  then S5[1]=242;   # < less than 28 days (4 weeks) old
+    elif [[ $TIMEDIFF -lt 15724800 ]]; then S5[1]=240;   # < less than 26 weeks (6 months) old
+    elif [[ $TIMEDIFF -lt 31449600 ]]; then S5[1]=238;   # < less than 1 year old
+    elif [[ $TIMEDIFF -lt 62899200 ]]; then S5[1]=236;   # < less than 2 years old
+    else                                    S5[1]=234;   # > more than 2 years old
     fi;
     # ARR[6]="\033[38;5;$S5[1]m$ARR[6]\033[0m"
     # slow
