@@ -47,7 +47,7 @@ k () {
   k=1; while [[ k -le $#RESULTS  ]]
   do
     # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
-    REPOMARKER=" "
+    REPOMARKER="\033[38;5;235m|\033[0m"
     IS_DIRECTORY=false
     IS_SYMLINK=false
     IS_EXECUTABLE=false
@@ -65,7 +65,7 @@ k () {
 
     # Check for file types
     if [[ -d $NAME ]]; then IS_DIRECTORY=true; fi
-    if [[ -h $NAME ]]; then   IS_SYMLINK=true; fi
+    if [[ -L $NAME ]]; then   IS_SYMLINK=true; fi
 
     # Check for git repo, first checking if the result is a directory
     if [[ $IS_DIRECTORY == true || $IS_SYMLINK == true && $IS_DIRECTORY == true ]] # if a directory
@@ -124,6 +124,12 @@ k () {
     # --- --- rwx warning
     if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT="\033[30;41m$PERMISSIONS\033[0m"; fi
 
+    # ------------------------------------------------------------------------------------------------------------------------
+    # Colour Owner and Group
+    # ------------------------------------------------------------------------------------------------------------------------
+
+    OWNER="\033[38;5;241m$OWNER\033[0m"
+    GROUP="\033[38;5;241m$GROUP\033[0m"
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour owner and permissions
@@ -160,16 +166,16 @@ k () {
     TIME_COLOR=196m
     TIME_DIFF=$(($EPOCH-$DATE[1]))
       if [[ $TIME_DIFF -lt 0 ]];        then TIME_COLOR=196m;   # < in the future, #spooky
-    elif [[ $TIME_DIFF -lt 60 ]];       then TIME_COLOR=251m;   # < less than a min old
-    elif [[ $TIME_DIFF -lt 3600 ]];     then TIME_COLOR=250m;   # < less than an hour old
-    elif [[ $TIME_DIFF -lt 43200 ]];    then TIME_COLOR=248m;   # < less than 12 hours old
-    elif [[ $TIME_DIFF -lt 86400 ]];    then TIME_COLOR=246m;   # < less than 1 day old
-    elif [[ $TIME_DIFF -lt 604800 ]];   then TIME_COLOR=244m;   # < less than 1 week old
-    elif [[ $TIME_DIFF -lt 2419200 ]];  then TIME_COLOR=242m;   # < less than 28 days (4 weeks) old
-    elif [[ $TIME_DIFF -lt 15724800 ]]; then TIME_COLOR=240m;   # < less than 26 weeks (6 months) old
-    elif [[ $TIME_DIFF -lt 31449600 ]]; then TIME_COLOR=238m;   # < less than 1 year old
-    elif [[ $TIME_DIFF -lt 62899200 ]]; then TIME_COLOR=236m;   # < less than 2 years old
-    else                                     TIME_COLOR=234m;   # > more than 2 years old
+    elif [[ $TIME_DIFF -lt 60 ]];       then TIME_COLOR=255m;   # < less than a min old
+    elif [[ $TIME_DIFF -lt 3600 ]];     then TIME_COLOR=255m;   # < less than an hour old
+    elif [[ $TIME_DIFF -lt 43200 ]];    then TIME_COLOR=252m;   # < less than 12 hours old
+    elif [[ $TIME_DIFF -lt 86400 ]];    then TIME_COLOR=248m;   # < less than 1 day old
+    elif [[ $TIME_DIFF -lt 604800 ]];   then TIME_COLOR=246m;   # < less than 1 week old
+    elif [[ $TIME_DIFF -lt 2419200 ]];  then TIME_COLOR=244m;   # < less than 28 days (4 weeks) old
+    elif [[ $TIME_DIFF -lt 15724800 ]]; then TIME_COLOR=243m;   # < less than 26 weeks (6 months) old
+    elif [[ $TIME_DIFF -lt 31449600 ]]; then TIME_COLOR=242m;   # < less than 1 year old
+    elif [[ $TIME_DIFF -lt 62899200 ]]; then TIME_COLOR=241m;   # < less than 2 years old
+    else                                     TIME_COLOR=240m;   # > more than 2 years old
     fi;
 
     # Format date to show year if more than 6 months since last modified
@@ -197,7 +203,7 @@ k () {
     # ------------------------------------------------------------------------------------------------------------------------
     # Format symlink target
     # ------------------------------------------------------------------------------------------------------------------------
-    if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET=" -> "$SYMLINK_TARGET; fi
+    if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> "$SYMLINK_TARGET; fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Display final result
