@@ -2,7 +2,7 @@
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
 # new k
 k () {
-  # Stop stat failing when a directory contains either no files or hidden files
+  # Stop stat failing when a directory contains either no files or no hidden files
   setopt local_options null_glob
 
   EPOCH=`date -j +%s`
