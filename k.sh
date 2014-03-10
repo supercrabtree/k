@@ -9,23 +9,27 @@ k () {
 
   # Get now
   EPOCH=`date -j +%s`
-
+  TOTAL_BLOCKS=0
   MAX_LEN=(0 0 0 0 0 0)
 
   # String "~|~" acts a delimeter to split string
-  STAT_CALL="%Sp~|~%l~|~%Su~|~%Sg~|~%Z~|~%Sm~|~%N~|~%Y"
+  STAT_CALL="%b~#~%Sp~|~%l~|~%Su~|~%Sg~|~%Z~|~%Sm~|~%N~|~%Y"
   STAT_TIME="%s^%d^%b^%H:%M^%Y"
-  # STATTIME="%s"
 
   # Array to hold results from `stat` call
   RESULTS=()
 
-  # Push each stat result to array to make a single stat call
+  # Break total blocks of the front of the stat call, then push the rest to results
   i=1; stat -f $STAT_CALL -t $STAT_TIME . .. .* * | while read STAT_RESULTS
   do
-    RESULTS+=($STAT_RESULTS)
+    STAT_RESULTS=(${(s:~#~:)STAT_RESULTS})
+    TOTAL_BLOCKS=$((TOTAL_BLOCKS+STAT_RESULTS[1]))
+    RESULTS+=($STAT_RESULTS[2])
     i=$((i+1))
   done
+
+  # Print total block before listing
+  echo "total "$TOTAL_BLOCKS
 
   # On each result calculate padding by getting max length on each array member
   j=1; while [[ j -le $#RESULTS  ]]
@@ -38,6 +42,7 @@ k () {
     if [[ $#A[5] -ge $MAX_LEN[5] ]]; then MAX_LEN[5]=$#A[5]; fi;
     j=$((j+1))
   done
+
 
   k=1; while [[ k -le $#RESULTS  ]]
   do
@@ -142,36 +147,35 @@ k () {
 
 
     # ------------------------------------------------------------------------------------------------------------------------
-    # Colour the date and time based on age
+    # Colour the date and time based on age, then format for output
     # ------------------------------------------------------------------------------------------------------------------------
 
-    # fade older times
-    # S5=(7)
-    # TIMEDIFF=$(($EPOCH-$ARR[6]))
-    #   if [[ $TIMEDIFF -lt 0 ]];        then S5[1]=196;   # < in the future, #spooky
-    # elif [[ $TIMEDIFF -lt 60 ]];       then S5[1]=251;   # < less than a min old
-    # elif [[ $TIMEDIFF -lt 3600 ]];     then S5[1]=250;   # < less than an hour old
-    # elif [[ $TIMEDIFF -lt 43200 ]];    then S5[1]=248;   # < less than 12 hours old
-    # elif [[ $TIMEDIFF -lt 86400 ]];    then S5[1]=246;   # < less than 1 day old
-    # elif [[ $TIMEDIFF -lt 604800 ]];   then S5[1]=244;   # < less than 1 week old
-    # elif [[ $TIMEDIFF -lt 2419200 ]];  then S5[1]=242;   # < less than 28 days (4 weeks) old
-    # elif [[ $TIMEDIFF -lt 15724800 ]]; then S5[1]=240;   # < less than 26 weeks (6 months) old
-    # elif [[ $TIMEDIFF -lt 31449600 ]]; then S5[1]=238;   # < less than 1 year old
-    # elif [[ $TIMEDIFF -lt 62899200 ]]; then S5[1]=236;   # < less than 2 years old
-    # else                                    S5[1]=234;   # > more than 2 years old
-    # fi;
-    # # ARR[6]="\033[38;5;$S5[1]m$ARR[6]\033[0m"
-    # # slow
-    # if [[ $TIMEDIFF -lt 15724800 ]]; then
-    #   # DATE="$(stat -f "%Sm" -t "%d %b %H:%M" $NAME)"
-    #   DATE="$(date -j -f "%s" $ARR[6] "+%d %b %H:%M")"
-    #   else
-    #   # DATE="$(stat -f "%Sm" -t "%d %b  %Y" $NAME)"
-    #   DATE="$(date -j -f "%s" $ARR[6] "+%d %b  %Y")"
-    # fi;
-    # # echo $S5
-    # DATE[1]=${DATE[1]//0/"\033[0;37m \033[0m"}
-    # DATE="\033[38;5;$S5[1]m$DATE\033[0m"
+    # Setup colours based on time difference
+    TIME_COLOR=196m
+    TIME_DIFF=$(($EPOCH-$DATE[1]))
+      if [[ $TIME_DIFF -lt 0 ]];        then TIME_COLOR=196m;   # < in the future, #spooky
+    elif [[ $TIME_DIFF -lt 60 ]];       then TIME_COLOR=251m;   # < less than a min old
+    elif [[ $TIME_DIFF -lt 3600 ]];     then TIME_COLOR=250m;   # < less than an hour old
+    elif [[ $TIME_DIFF -lt 43200 ]];    then TIME_COLOR=248m;   # < less than 12 hours old
+    elif [[ $TIME_DIFF -lt 86400 ]];    then TIME_COLOR=246m;   # < less than 1 day old
+    elif [[ $TIME_DIFF -lt 604800 ]];   then TIME_COLOR=244m;   # < less than 1 week old
+    elif [[ $TIME_DIFF -lt 2419200 ]];  then TIME_COLOR=242m;   # < less than 28 days (4 weeks) old
+    elif [[ $TIME_DIFF -lt 15724800 ]]; then TIME_COLOR=240m;   # < less than 26 weeks (6 months) old
+    elif [[ $TIME_DIFF -lt 31449600 ]]; then TIME_COLOR=238m;   # < less than 1 year old
+    elif [[ $TIME_DIFF -lt 62899200 ]]; then TIME_COLOR=236m;   # < less than 2 years old
+    else                                     TIME_COLOR=234m;   # > more than 2 years old
+    fi;
+
+    # Format date to show year if more than 6 months since last modified
+    if [[ $TIME_DIFF -lt 15724800 ]]; then
+      DATE_OUTPUT=$DATE[2]" "$DATE[3]" "$DATE[4]
+      else
+      DATE_OUTPUT=$DATE[2]" "$DATE[3]"  "$DATE[5]
+    fi;
+    DATE_OUTPUT[1]=${DATE_OUTPUT[1]//0/" "} # If day of month begins with zero, replace zero with space
+
+    # Apply colour to formated date
+    DATE_OUTPUT="\033[38;5;$TIME_COLOR$DATE_OUTPUT\033[0m"
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the filename
@@ -192,7 +196,7 @@ k () {
     # ------------------------------------------------------------------------------------------------------------------------
     # Display final result
     # ------------------------------------------------------------------------------------------------------------------------
-    echo $PERMISSIONS_OUTPUT " "$SYMLINKS $OWNER " "$GROUP " "$FILESIZE $DATE[1] $REPOMARKER $NAME $SYMLINK_TARGET
+    echo $PERMISSIONS_OUTPUT " "$SYMLINKS $OWNER " "$GROUP " "$FILESIZE $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET
 
     k=$((k+1)) # Bump loop index
   done
