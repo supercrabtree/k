@@ -195,8 +195,8 @@ k () {
       if [[ -d $NAME"/.git" ]] # if contains a git folder
         then
         if git --git-dir=`pwd`/$NAME/.git --work-tree=`pwd`/$NAME diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-          then REPOMARKER="\033[0;32m|\033[0m" # Show a green vertical bar for dirty
-          else REPOMARKER="\033[0;31m|\033[0m" # Show a red vertical bar if clean
+          then REPOMARKER="\033[0;32m‖\033[0m" # Show a green vertical bar for clean
+          else REPOMARKER="\033[0;31m‖\033[0m" # Show a red vertical bar if dirty
         fi
       fi
     fi
