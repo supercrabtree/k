@@ -19,6 +19,9 @@ k () {
   # Array to hold results from `stat` call
   RESULTS=()
 
+  # only set once so must be out of the main loop
+  IS_GIT_REPO=false
+
   # Break total blocks of the front of the stat call, then push the rest to results
   i=1; stat -f $STAT_CALL -t $STAT_TIME . .. .* * | while read STAT_RESULTS
   do
@@ -47,7 +50,7 @@ k () {
   k=1; while [[ k -le $#RESULTS  ]]
   do
     # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
-    REPOMARKER="\033[38;5;235m|\033[0m"
+    REPOMARKER=" "
     IS_DIRECTORY=false
     IS_SYMLINK=false
     IS_EXECUTABLE=false
@@ -67,17 +70,11 @@ k () {
     if [[ -d $NAME ]]; then IS_DIRECTORY=true; fi
     if [[ -L $NAME ]]; then   IS_SYMLINK=true; fi
 
-    # Check for git repo, first checking if the result is a directory
-    if [[ $IS_DIRECTORY == true || $IS_SYMLINK == true && $IS_DIRECTORY == true ]] # if a directory
+    # is this a git repo
+    if [[ $k == 1 && $(git rev-parse --is-inside-work-tree) == true ]]
       then
-      if [[ -d $NAME"/.git" ]] # if contains a git folder
-        then
-        if git --git-dir=`pwd`/$NAME/.git --work-tree=`pwd`/$NAME diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-          then REPOMARKER="\033[0;32m|\033[0m" # Show a red vertical bar for dirty
-          else REPOMARKER="\033[0;31m|\033[0m" # Show a green vertical bar if clean
-        fi
-      fi
-    fi
+      IS_GIT_REPO=true
+    fi;
 
     # Pad so all the lines align - firstline gets padded the other way
     while [[ $#PERMISSIONS -lt $MAX_LEN[1] ]]; do PERMISSIONS=$PERMISSIONS" "; done;
@@ -188,6 +185,32 @@ k () {
 
     # Apply colour to formated date
     DATE_OUTPUT="\033[38;5;$TIME_COLOR$DATE_OUTPUT\033[0m"
+
+    # ------------------------------------------------------------------------------------------------------------------------
+    # Colour the repomarker
+    # ------------------------------------------------------------------------------------------------------------------------
+     # Check for git repo, first checking if the result is a directory
+    if [[ ($IS_GIT_REPO == false || $k == 1 || $k == 2) && ($IS_DIRECTORY == true || $IS_SYMLINK == true && $IS_DIRECTORY == true) ]] # if a directory
+      then
+      if [[ -d $NAME"/.git" ]] # if contains a git folder
+        then
+        if git --git-dir=`pwd`/$NAME/.git --work-tree=`pwd`/$NAME diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+          then REPOMARKER="\033[0;32m|\033[0m" # Show a green vertical bar for dirty
+          else REPOMARKER="\033[0;31m|\033[0m" # Show a red vertical bar if clean
+        fi
+      fi
+    fi
+
+    if [[ $IS_GIT_REPO == true && $k != 1 && $k != 2 && $NAME != '.git' && $NAME != '.gitignore' ]]
+      then
+      STATUS=$(git status --porcelain --ignored --untracked-files="normal" $NAME);
+      STATUS=$STATUS[1,2]
+        if [[ $STATUS == ' M' ]]; then REPOMARKER="\033[0;31m|\033[0m";     # Modified
+      elif [[ $STATUS == '??' ]]; then REPOMARKER="\033[38;5;246m|\033[0m"; # Untracked
+      elif [[ $STATUS == '!!' ]]; then REPOMARKER="\033[38;5;236m|\033[0m"; # Ignored
+      else                             REPOMARKER="\033[0;32m|\033[0m";     # Good
+      fi
+    fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the filename
