@@ -4,6 +4,9 @@
 
 # new k
 k () {
+  OLD_TERM=$TERM
+  TERM='xterm-256color'
+
   # Stop stat failing when a directory contains either no files or no hidden files
   setopt local_options null_glob
 
@@ -83,10 +86,6 @@ k () {
     while [[ $#GROUP       -lt $MAX_LEN[4] ]]; do GROUP=" "$GROUP;             done;
     while [[ $#FILESIZE    -lt $MAX_LEN[5] ]]; do FILESIZE=" "$FILESIZE;       done;
 
-    # ------------------------------------------------------------------------------------------------------------------------
-    # Colour the permissions
-    # ------------------------------------------------------------------------------------------------------------------------
-
     # Colour the first character based on filetype
     FILETYPE=$PERMISSIONS
     FILETYPE=$FILETYPE[1]
@@ -120,6 +119,10 @@ k () {
 
     # --- --- rwx warning
     if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT="\033[30;41m$PERMISSIONS\033[0m"; fi
+
+    # ------------------------------------------------------------------------------------------------------------------------
+    # Colour the symlinks
+    # ------------------------------------------------------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour Owner and Group
@@ -233,4 +236,5 @@ k () {
 
     k=$((k+1)) # Bump loop index
   done
+  TERM=$OLD_TERM
 }
