@@ -2,28 +2,28 @@
 
 > k is the new l, yo
 
-Adds new features to standard `ls` (or more closely the alias `ls -la`) for zsh.
-* Color coded permissions.
-* Git dirty checking.
+Adds git dirty checking to directory listings for zsh.
 
-### Installation
-Put `k.sh` somewhere, and source it in your `.zshrc`.
-
-```bash
-source ~/path-to/k/k.sh
-```
+* Grey Vertical Bar represents an ignored files.
+* Red Vertical Bar represents an uncommited change.
+* Green Vertical Bar represents an up-to-date file or directory.
 
 ### Usage
 hit k, just like you would l (or ls)
 
-```bash
+```shell
 k
 ```
 
-Profit.
+### Installation
+Put `k.sh` somewhere, and source it in your `.zshrc`.
+
+```shell
+source ~/path-to/k/k.sh
+```
 
 ### Thanks
-ZSH Team  
-BSD Team  
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with Oh My ZSH  
+ZSH Team
+BSD Team
+[Robby Russell](https://github.com/robbyrussell) for making the shell fun with Oh My ZSH
 [Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme
