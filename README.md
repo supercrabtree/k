@@ -1,4 +1,4 @@
-# k
+![k](https://raw.githubusercontent.com/supercrabtree/k/master/k-logo.png)
 
 > k is the new l, yo
 
