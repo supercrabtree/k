@@ -1,14 +1,20 @@
-# https://developer.apple.com/library/mac/documentation/Darwin/Reference/Manpages/man1/ls.1.html // useful, can click links
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
-# http://stackoverflow.com/questions/11188621/how-can-i-convert-seconds-since-the-epoch-to-hours-minutes-seconds-in-java/11197532#11197532
 
 # new k
 k () {
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  # Setup
+  # ------------------------------------------------------------------------------------------------------------------------
+  # Turn on 256 colour terminal, not sure this works at all.
   OLD_TERM=$TERM
   TERM='xterm-256color'
 
   # Stop stat failing when a directory contains either no files or no hidden files
   setopt local_options null_glob
+
+  # ---------------------------------
+  # Vars
 
   # Get now
   EPOCH=`date -j +%s`
@@ -24,6 +30,10 @@ k () {
 
   # only set once so must be out of the main loop
   IS_GIT_REPO=false
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  # Stat call to get directory listing
+  # ------------------------------------------------------------------------------------------------------------------------
 
   # Break total blocks of the front of the stat call, then push the rest to results
   i=1; stat -f $STAT_CALL -t $STAT_TIME . .. .* * | while read STAT_RESULTS
@@ -49,6 +59,9 @@ k () {
     j=$((j+1))
   done
 
+  # ------------------------------------------------------------------------------------------------------------------------
+  # Loop through each line of stat, pad where appropriate and do git dirty checking
+  # ------------------------------------------------------------------------------------------------------------------------
 
   k=1; while [[ k -le $#RESULTS  ]]
   do
@@ -87,9 +100,8 @@ k () {
     while [[ $#FILESIZE    -lt $MAX_LEN[5] ]]; do FILESIZE=" "$FILESIZE;       done;
 
     # ------------------------------------------------------------------------------------------------------------------------
-    # Colour the permissions
+    # Colour the permissions - TODO
     # ------------------------------------------------------------------------------------------------------------------------
-
     # Colour the first character based on filetype
     FILETYPE=$PERMISSIONS
     FILETYPE=$FILETYPE[1]
@@ -125,20 +137,18 @@ k () {
     if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT="\033[30;41m$PERMISSIONS\033[0m"; fi
 
     # ------------------------------------------------------------------------------------------------------------------------
-    # Colour the symlinks
+    # Colour the symlinks - TODO
     # ------------------------------------------------------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour Owner and Group
     # ------------------------------------------------------------------------------------------------------------------------
-
     OWNER="\033[38;5;241m$OWNER\033[0m"
     GROUP="\033[38;5;241m$GROUP\033[0m"
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour file weights
     # ------------------------------------------------------------------------------------------------------------------------
-
     # GREEN_TO_RED=(46 82 118 154 190 226 220 214 208 202 196)
     COLOR=(7) # cant get int to work somehow?
       if [[ $FILESIZE -le 1024 ]];    then COLOR[1]=46;    # <= 1kb
@@ -155,11 +165,9 @@ k () {
     fi;
     FILESIZE="\033[38;5;$COLOR[1]m$FILESIZE\033[0m"
 
-
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the date and time based on age, then format for output
     # ------------------------------------------------------------------------------------------------------------------------
-
     # Setup colours based on time difference
     TIME_DIFF=$(($EPOCH-$DATE[1]))
       if [[ $TIME_DIFF -lt 0 ]];        then TIME_COLOR=196m;   # < in the future, #spooky
