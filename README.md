@@ -2,9 +2,10 @@
 
 > k is the new l, yo
 
+## A directory listing shell script for zsh, with git features. 
 k is a zsh script to make directory listings more readable, adding a bit of color and some git information.
 
-## Repo markers on directory listings
+### Git status on entire repos
 Red for dirty, green for committed.
 
 Turns this:  
@@ -13,7 +14,7 @@ Turns this:
 Into this:  
 ![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
-## Git status on files with a working tree
+### Git status on files within a working tree
 Red for dirty, green for committed, orange for untracked, grey for ingored.
 
 Turns this:  
@@ -22,7 +23,7 @@ Turns this:
 Into this:  
 ![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-k.jpg)
 
-## File weight colours
+### File weight colours
 Files sizes are graded from green for small (< 1k), to red for huge (> 1mb).
 
 Turns this:  
@@ -56,4 +57,4 @@ profit
 ## Contributing
 Pull requests welcome.
 
-MIT License
+Copyright © George Crabtree & Christopher Newton. MIT License
