@@ -2,11 +2,8 @@
 
 > k is the new l, yo
 
-Adds git dirty checking to directory listings for zsh.
-
-* Grey Vertical Bar represents ignored file.
-* Red Vertical Bar represents an uncommited change.
-* Green Vertical Bar represents an up-to-date file or directory.
+## Repos
+![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
 ### Usage
 hit k, just like you would l (or ls)
@@ -23,8 +20,8 @@ source ~/path-to/k/k.sh
 ```
 
 ### Thanks
-ZSH Team  
-BSD Team  
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
-[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme  
-[Rupa](https://github.com/rupa/z) for that slammin' strapline   
+ZSH Team
+BSD Team
+[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh
+[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme
+[Rupa](https://github.com/rupa/z) for that slammin' strapline
