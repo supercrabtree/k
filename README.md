@@ -25,6 +25,6 @@ source ~/path-to/k/k.sh
 ### Thanks
 ZSH Team  
 BSD Team  
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with Oh My ZSH  
+[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
 [Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme  
 [Rupa](https://github.com/rupa/z) for that slammin' strapline   
