@@ -2,7 +2,7 @@
 
 > k is the new l, yo
 
-## A directory listing shell script for zsh, with git features. 
+## Directory listings for zsh with git features. 
 k is a zsh script to make directory listings more readable, adding a bit of color and some git information.
 
 ### Git status on entire repos
