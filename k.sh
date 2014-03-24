@@ -209,7 +209,7 @@ k () {
       STATUS=$(git status --porcelain --ignored --untracked-files="normal" $NAME);
       STATUS=$STATUS[1,2]
         if [[ $STATUS == ' M' ]]; then REPOMARKER="\033[0;31m|\033[0m";     # Modified
-      elif [[ $STATUS == '??' ]]; then REPOMARKER="\033[38;5;246m|\033[0m"; # Untracked
+      elif [[ $STATUS == '??' ]]; then REPOMARKER="\033[38;5;214m|\033[0m"; # Untracked
       elif [[ $STATUS == '!!' ]]; then REPOMARKER="\033[38;5;238m|\033[0m"; # Ignored
       else                             REPOMARKER="\033[0;32m|\033[0m";     # Good
       fi
