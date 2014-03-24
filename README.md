@@ -3,6 +3,11 @@
 > k is the new l, yo
 
 ## Repos
+
+Turns boring direcory listing of your git repos from this:
+![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-ls.jpg)
+
+Into this:
 ![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
 ### Usage
