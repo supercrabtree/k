@@ -48,7 +48,7 @@ k
 profit
 
 ## Thanks
-zsh Team  
+[Paul Falstad](http://www.falstad.com/) for zsh  
 [Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
 [Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from zsh pure theme  
 [Rupa](https://github.com/rupa/z) for that slammin' strapline  
