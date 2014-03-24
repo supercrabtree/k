@@ -4,7 +4,7 @@
 
 Adds git dirty checking to directory listings for zsh.
 
-* Grey Vertical Bar represents an ignored files.
+* Grey Vertical Bar represents ignored file.
 * Red Vertical Bar represents an uncommited change.
 * Green Vertical Bar represents an up-to-date file or directory.
 
@@ -23,7 +23,7 @@ source ~/path-to/k/k.sh
 ```
 
 ### Thanks
-ZSH Team
-BSD Team
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with Oh My ZSH
-[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme
+ZSH Team  
+BSD Team  
+[Robby Russell](https://github.com/robbyrussell) for making the shell fun with Oh My ZSH  
+[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme  
