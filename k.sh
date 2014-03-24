@@ -204,7 +204,7 @@ k () {
       fi
     fi
 
-    if [[ $IS_GIT_REPO == true && $k != 1 && $k != 2 && $NAME != '.git' && $NAME != '.gitignore' ]]
+    if [[ $IS_GIT_REPO == true && $k != 1 && $k != 2 && $NAME != '.git' ]]
       then
       STATUS=$(git status --porcelain --ignored --untracked-files="normal" $NAME);
       STATUS=$STATUS[1,2]
