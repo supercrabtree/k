@@ -2,31 +2,58 @@
 
 > k is the new l, yo
 
-## Repos
+k is a zsh script to make directory listings more readable, adding a bit of color and some git information.
 
-Turns boring direcory listing of your git repos from this:
+## Repo markers on directory listings
+Red for dirty, green for committed.
+
+Turns this:  
 ![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-ls.jpg)
 
-Into this:
-![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
+Into this:  
+![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
-### Usage
-hit k, just like you would l (or ls)
+## Git status on files with a working tree
+Red for dirty, green for committed, orange for untracked, grey for ingored.
 
-```shell
-k
-```
+Turns this:  
+![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-ls.jpg)
 
-### Installation
+Into this:  
+![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-k.jpg)
+
+## File weight colours
+Files sizes are graded from green for small (< 1k), to red for huge (> 1mb).
+
+Turns this:  
+![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-ls.jpg)
+
+Into this:  
+![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-k.jpg)
+
+
+## Usage
 Put `k.sh` somewhere, and source it in your `.zshrc`.
 
 ```shell
 source ~/path-to/k/k.sh
 ```
 
-### Thanks
-ZSH Team
-BSD Team
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh
-[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from Z pure theme
-[Rupa](https://github.com/rupa/z) for that slammin' strapline
+hit k
+
+```shell
+k
+```
+
+profit
+
+## Thanks
+zsh Team  
+[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
+[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from zsh pure theme  
+[Rupa](https://github.com/rupa/z) for that slammin' strapline  
+
+## Contributing
+Pull requests welcome.
+
+MIT License
