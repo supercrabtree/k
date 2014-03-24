@@ -57,4 +57,4 @@ profit
 ## Contributing
 Pull requests welcome.
 
-Copyright © George Crabtree & Christopher Newton. MIT License
+Copyright © 2014 George Crabtree & Christopher Newton. MIT License
