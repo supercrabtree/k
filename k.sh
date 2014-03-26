@@ -13,7 +13,7 @@ k () {
   # Vars
 
   # Get now
-  EPOCH=`date -j +%s`
+  EPOCH=`date +%s`
   TOTAL_BLOCKS=0
   MAX_LEN=(0 0 0 0 0 0)
 
