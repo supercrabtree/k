@@ -32,6 +32,11 @@ Turns this:
 Into this:  
 ![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-k.jpg)
 
+### Rotting dates
+
+Dates fade with age.
+![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
+
 
 ## Usage
 Put `k.sh` somewhere, and source it in your `.zshrc`.
