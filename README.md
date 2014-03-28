@@ -34,7 +34,7 @@ Into this:
 
 ### Rotting dates
 
-Dates fade with age.
+Dates fade with age.  
 ![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
 
