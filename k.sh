@@ -17,10 +17,6 @@ k () {
   TOTAL_BLOCKS=0
   MAX_LEN=(0 0 0 0 0 0)
 
-  # String "~|~" acts a delimeter to split string
-  STAT_CALL="%b~#~%Sp~|~%l~|~%Su~|~%Sg~|~%Z~|~%Sm~|~%N~|~%Y"
-  STAT_TIME="%s^%d^%b^%H:%M^%Y"
-
   # Array to hold results from `stat` call
   RESULTS=()
 
@@ -32,7 +28,7 @@ k () {
   # ------------------------------------------------------------------------------------------------------------------------
 
   # Break total blocks of the front of the stat call, then push the rest to results
-  i=1; stat -f $STAT_CALL -t $STAT_TIME . .. .* * | while read STAT_RESULTS
+  i=1; perl -MFcntl=:mode -MPOSIX=strftime -e 'my %TYPE_MAP = ( S_IFREG >> 12, q{-}, S_IFDIR >> 12, q{d}, S_IFLNK >> 12, q{l}, S_IFBLK >> 12, q{b}, S_IFCHR >> 12, q{c}, S_IFFIFO >> 12, q{p}, S_IFSOCK >> 12, q{s} ); my @MODE_MAP = qw(--- --x -w- -wx r-- r-x rw- rwx); sub format_mode { my ( $mode ) = @_; ($TYPE_MAP{$mode >> 12} || q{-}) . join(q{}, map { $MODE_MAP[$mode >> ($_ * 3) & 0x7] } reverse (0 .. 2)) } for(@ARGV) { ( $mode, $nlink, $uid, $gid, $size, $mtime, $blocks ) = (lstat)[2, 3, 4, 5, 7, 9, 12]; $mode = format_mode($mode); $uid = getpwuid($uid); $gid = getgrgid($gid); print $blocks, q{~#~}, join(q{~|~}, $mode, $nlink, $uid, $gid, $size, strftime(q{%s^%d^%b^%H:%M^%Y}, localtime($mtime)), $_, readlink || q{}), "\n"  }' . .. .* * | while read STAT_RESULTS
   do
     STAT_RESULTS=(${(s:~#~:)STAT_RESULTS})
     TOTAL_BLOCKS=$((TOTAL_BLOCKS+STAT_RESULTS[1]))
