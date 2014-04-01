@@ -1,132 +1,179 @@
+zmodload zsh/datetime
+zmodload -F zsh/stat b:zstat
+
 k () {
   # ------------------------------------------------------------------------------------------------------------------------
   # Setup
   # ------------------------------------------------------------------------------------------------------------------------
-  # Turn on 256 colour terminal, not sure this works at all.
-  OLD_TERM=$TERM
-  TERM='xterm-256color'
 
   # Stop stat failing when a directory contains either no files or no hidden files
-  setopt local_options null_glob
+  # Track if we _accidentally_ create a new global variable
+  setopt local_options null_glob warn_create_global
+
+  # Turn on 256 colour terminal, not sure this works at all.
+  typeset OLD_TERM="$TERM"
+  TERM='xterm-256color'
 
   # ---------------------------------
   # Vars
 
+  typeset -a MAX_LEN A RESULTS STAT_RESULTS
+  typeset TOTAL_BLOCKS
+
   # Get now
-  EPOCH=`date +%s`
-  TOTAL_BLOCKS=0
+  typeset K_EPOCH="${EPOCHSECONDS:?}"
+
+  typeset -i TOTAL_BLOCKS=0
+
   MAX_LEN=(0 0 0 0 0 0)
 
   # Array to hold results from `stat` call
   RESULTS=()
 
   # only set once so must be out of the main loop
-  IS_GIT_REPO=false
+  typeset -i IS_GIT_REPO=0
+
+  typeset -i LARGE_FILE_COLOR=196
+  typeset -a SIZELIMITS_TO_COLOR
+  SIZELIMITS_TO_COLOR=(
+      1024  46    # <= 1kb
+      2048  82    # <= 2kb
+      3072  118   # <= 3kb
+      5120  154   # <= 5kb
+     10240  190   # <= 10kb
+     20480  226   # <= 20kb
+     40960  220   # <= 40kb
+    102400  214   # <= 100kb
+    262144  208   # <= 0.25mb || 256kb
+    524288  202   # <= 0.5mb || 512kb
+    )
+  typeset -i ANCIENT_TIME_COLOR=236  # > more than 2 years old
+  typeset -a FILEAGES_TO_COLOR
+  FILEAGES_TO_COLOR=(
+           0 196  # < in the future, #spooky
+          60 255  # < less than a min old
+        3600 252  # < less than an hour old
+       86400 250  # < less than 1 day old
+      604800 244  # < less than 1 week old
+     2419200 244  # < less than 28 days (4 weeks) old
+    15724800 242  # < less than 26 weeks (6 months) old
+    31449600 240  # < less than 1 year old
+    62899200 238  # < less than 2 years old
+    )
 
   # ------------------------------------------------------------------------------------------------------------------------
   # Stat call to get directory listing
   # ------------------------------------------------------------------------------------------------------------------------
 
   # Break total blocks of the front of the stat call, then push the rest to results
-  i=1; perl -MFcntl=:mode -MPOSIX=strftime -e 'my %TYPE_MAP = ( S_IFREG >> 12, q{-}, S_IFDIR >> 12, q{d}, S_IFLNK >> 12, q{l}, S_IFBLK >> 12, q{b}, S_IFCHR >> 12, q{c}, S_IFFIFO >> 12, q{p}, S_IFSOCK >> 12, q{s} ); my @MODE_MAP = qw(--- --x -w- -wx r-- r-x rw- rwx); sub format_mode { my ( $mode ) = @_; ($TYPE_MAP{$mode >> 12} || q{-}) . join(q{}, map { $MODE_MAP[$mode >> ($_ * 3) & 0x7] } reverse (0 .. 2)) } for(@ARGV) { ( $mode, $nlink, $uid, $gid, $size, $mtime, $blocks ) = (lstat)[2, 3, 4, 5, 7, 9, 12]; $mode = format_mode($mode); $uid = getpwuid($uid); $gid = getgrgid($gid); print $blocks, q{~#~}, join(q{~|~}, $mode, $nlink, $uid, $gid, $size, strftime(q{%s^%d^%b^%H:%M^%Y}, localtime($mtime)), $_, readlink || q{}), "\n"  }' . .. .* * | while read STAT_RESULTS
+  typeset -i i=1 j=1 k=1
+  typeset -a STATS_PARAMS_LIST
+  typeset fn statvar
+  typeset -A sv
+  for fn in . .. *(D)
   do
-    STAT_RESULTS=(${(s:~#~:)STAT_RESULTS})
-    TOTAL_BLOCKS=$((TOTAL_BLOCKS+STAT_RESULTS[1]))
-    RESULTS+=($STAT_RESULTS[2])
-    i=$((i+1))
+    statvar="stats_$i"
+    typeset -A $statvar
+    zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" "$fn"  # use lstat, render mode/uid/gid to strings
+    STATS_PARAMS_LIST+=($statvar)
+    TOTAL_BLOCKS+=${statvar[blocks]}
+    i+=1
   done
 
   # Print total block before listing
-  echo "total "$TOTAL_BLOCKS
+  echo "total $TOTAL_BLOCKS"
 
   # On each result calculate padding by getting max length on each array member
-  j=1; while [[ j -le $#RESULTS  ]]
+  for statvar in "${STATS_PARAMS_LIST[@]}"
   do
-    A=(${(s:~|~:)RESULTS[j]})
-    if [[ $#A[1] -ge $MAX_LEN[1] ]]; then MAX_LEN[1]=$#A[1]; fi;
-    if [[ $#A[2] -ge $MAX_LEN[2] ]]; then MAX_LEN[2]=$#A[2]; fi;
-    if [[ $#A[3] -ge $MAX_LEN[3] ]]; then MAX_LEN[3]=$#A[3]; fi;
-    if [[ $#A[4] -ge $MAX_LEN[4] ]]; then MAX_LEN[4]=$#A[4]; fi;
-    if [[ $#A[5] -ge $MAX_LEN[5] ]]; then MAX_LEN[5]=$#A[5]; fi;
-    j=$((j+1))
+    sv=("${(@Pkv)statvar}")
+    if [[ ${#sv[mode]}  -gt $MAX_LEN[1] ]]; then MAX_LEN[1]=${#sv[mode]}  ; fi
+    if [[ ${#sv[nlink]} -gt $MAX_LEN[2] ]]; then MAX_LEN[2]=${#sv[nlink]} ; fi
+    if [[ ${#sv[uid]}   -gt $MAX_LEN[3] ]]; then MAX_LEN[3]=${#sv[uid]}   ; fi
+    if [[ ${#sv[gid]}   -gt $MAX_LEN[4] ]]; then MAX_LEN[4]=${#sv[gid]}   ; fi
+    if [[ ${#sv[size]}  -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}  ; fi
   done
 
   # ------------------------------------------------------------------------------------------------------------------------
   # Loop through each line of stat, pad where appropriate and do git dirty checking
   # ------------------------------------------------------------------------------------------------------------------------
 
-  k=1; while [[ k -le $#RESULTS  ]]
+  typeset REPOMARKER
+  typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE DATE NAME SYMLINK_TARGET
+  typeset FILETYPE PER1 PER2 PER3 PERMISSIONS_OUTPUT STATUS
+  typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
+  typeset -i IS_DIRECTORY IS_SYMLINK IS_EXECUTABLE
+  typeset -i COLOR
+
+  k=1
+  for statvar in "${STATS_PARAMS_LIST[@]}"
   do
+    sv=("${(@Pkv)statvar}")
+
     # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
     REPOMARKER=" "
-    IS_DIRECTORY=false
-    IS_SYMLINK=false
-    IS_EXECUTABLE=false
+    IS_DIRECTORY=0
+    IS_SYMLINK=0
+    IS_EXECUTABLE=0
 
-    # create array from results by splitting on ~|~
-    A=(${(s:~|~:)RESULTS[k]})
-       PERMISSIONS=$A[1]
-          SYMLINKS=$A[2]
-             OWNER=$A[3]
-             GROUP=$A[4]
-          FILESIZE=$A[5]
-              DATE=(${(s:^:)A[6]}) # Split date on ^
-              NAME=$A[7]
-    SYMLINK_TARGET=$A[8]
+       PERMISSIONS="${sv[mode]}"
+     HARDLINKCOUNT="${sv[nlink]}"
+             OWNER="${sv[uid]}"
+             GROUP="${sv[gid]}"
+          FILESIZE="${sv[size]}"
+              DATE=(${(s:^:)sv[mtime]}) # Split date on ^
+              NAME="${sv[name]}"
+    SYMLINK_TARGET="${sv[link]}"
 
     # Check for file types
-    if [[ -d $NAME ]]; then IS_DIRECTORY=true; fi
-    if [[ -L $NAME ]]; then   IS_SYMLINK=true; fi
+    if [[ -d "$NAME" ]]; then IS_DIRECTORY=1; fi
+    if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
     # is this a git repo
     if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
       then
-      IS_GIT_REPO=true
+      IS_GIT_REPO=1
     fi;
 
     # Pad so all the lines align - firstline gets padded the other way
-    while [[ $#PERMISSIONS -lt $MAX_LEN[1] ]]; do PERMISSIONS=$PERMISSIONS" "; done;
-    while [[ $#SYMLINKS    -lt $MAX_LEN[2] ]]; do SYMLINKS=" "$SYMLINKS;       done;
-    while [[ $#OWNER       -lt $MAX_LEN[3] ]]; do OWNER=" "$OWNER;             done;
-    while [[ $#GROUP       -lt $MAX_LEN[4] ]]; do GROUP=" "$GROUP;             done;
-    while [[ $#FILESIZE    -lt $MAX_LEN[5] ]]; do FILESIZE=" "$FILESIZE;       done;
+      PERMISSIONS="${(r:MAX_LEN[1]:)PERMISSIONS}"
+    HARDLINKCOUNT="${(l:MAX_LEN[2]:)HARDLINKCOUNT}"
+            OWNER="${(l:MAX_LEN[3]:)OWNER}"
+            GROUP="${(l:MAX_LEN[4]:)GROUP}"
+         FILESIZE="${(l:MAX_LEN[5]:)FILESIZE}"
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the permissions - TODO
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the first character based on filetype
-    FILETYPE=$PERMISSIONS
-    FILETYPE=$FILETYPE[1]
-    if [[ $IS_DIRECTORY == true ]]
+    FILETYPE="${PERMISSIONS[1]}"
+    if (( IS_DIRECTORY ))
       then
-      FILETYPE=${FILETYPE//d/"\033[1;36md\033[0m"};
-    elif [[ $IS_SYMLINK == true ]];
+      FILETYPE=${FILETYPE//d/$'\e[1;36m'd$'\e[0m'};
+    elif (( IS_SYMLINK ))
       then
-      FILETYPE=${FILETYPE//l/"\033[0;35ml\033[0m"};
+      FILETYPE=${FILETYPE//l/$'\e[0;35m'l$'\e[0m'};
     elif [[ $FILETYPE == "-" ]];
       then
-      FILETYPE=${FILETYPE//-/"\033[0;37m-\033[0m"};
+      FILETYPE=${FILETYPE//-/$'\e[0;37m'-$'\e[0m'};
     fi
 
     # Permissions Owner
-    PER1=$PERMISSIONS
-    PER1=$PER1[2,4]
+    PER1="${PERMISSIONS[2,4]}"
 
     # Permissions Group
-    PER2=$PERMISSIONS
-    PER2=$PER2[5,7]
+    PER2="${PERMISSIONS[5,7]}"
 
     # Permissions User
-    PER3=$PERMISSIONS
-    PER3=$PER3[8,10]
+    PER3="${PERMISSIONS[8,10]}"
 
-    PERMISSIONS_OUTPUT=$FILETYPE$PER1$PER2$PER3
+    PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
 
     # --x --x --x warning
-    if [[ $PER1[3] == "x" || $PER1[3] == "x" || $PER3[3] == "x" ]]; then IS_EXECUTABLE=true; fi
+    if [[ $PER1[3] == "x" || $PER2[3] == "x" || $PER3[3] == "x" ]]; then IS_EXECUTABLE=1; fi
 
     # --- --- rwx warning
-    if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT="\033[30;41m$PERMISSIONS\033[0m"; fi
+    if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT=$'\e[30;41m'"$PERMISSIONS"$'\e[0m'; fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the symlinks - TODO
@@ -135,107 +182,103 @@ k () {
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour Owner and Group
     # ------------------------------------------------------------------------------------------------------------------------
-    OWNER="\033[38;5;241m$OWNER\033[0m"
-    GROUP="\033[38;5;241m$GROUP\033[0m"
+    OWNER=$'\e[38;5;241m'"$OWNER"$'\e[0m'
+    GROUP=$'\e[38;5;241m'"$GROUP"$'\e[0m'
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour file weights
     # ------------------------------------------------------------------------------------------------------------------------
-    # GREEN_TO_RED=(46 82 118 154 190 226 220 214 208 202 196)
-    COLOR=(7) # cant get int to work somehow?
-      if [[ $FILESIZE -le 1024 ]];    then COLOR[1]=46;    # <= 1kb
-    elif [[ $FILESIZE -le 2048 ]];    then COLOR[1]=82;    # <= 2kb
-    elif [[ $FILESIZE -le 3072 ]];    then COLOR[1]=118;   # <= 3kb
-    elif [[ $FILESIZE -le 5120 ]];    then COLOR[1]=154;   # <= 5kb
-    elif [[ $FILESIZE -le 10240 ]];   then COLOR[1]=190;   # <= 10kb
-    elif [[ $FILESIZE -le 20480 ]];   then COLOR[1]=226;   # <= 20kb
-    elif [[ $FILESIZE -le 40960 ]];   then COLOR[1]=220;   # <= 40kb
-    elif [[ $FILESIZE -le 102400 ]];  then COLOR[1]=214;   # <= 100kb
-    elif [[ $FILESIZE -le 262144 ]];  then COLOR[1]=208;   # <= 0.25mb ]] 256kb
-    elif [[ $FILESIZE -le 524288 ]];  then COLOR[1]=202;   # <= 0.5mb || 512kb
-    else                                   COLOR[1]=196;   # >= 0.5mb || 512kb
-    fi;
-    FILESIZE="\033[38;5;$COLOR[1]m$FILESIZE\033[0m"
+    COLOR=7
+    for i j in ${SIZELIMITS_TO_COLOR[@]}
+    do
+      (( FILESIZE <= i )) || continue
+      COLOR=$j
+      break
+    done
+
+    FILESIZE=$'\e[38;5;'"${COLOR}m$FILESIZE"$'\e[0m'
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the date and time based on age, then format for output
     # ------------------------------------------------------------------------------------------------------------------------
     # Setup colours based on time difference
-    TIME_DIFF=$(($EPOCH-$DATE[1]))
-      if [[ $TIME_DIFF -lt 0 ]];        then TIME_COLOR=196m;   # < in the future, #spooky
-    elif [[ $TIME_DIFF -lt 60 ]];       then TIME_COLOR=255m;   # < less than a min old
-    elif [[ $TIME_DIFF -lt 3600 ]];     then TIME_COLOR=252m;   # < less than an hour old
-    elif [[ $TIME_DIFF -lt 86400 ]];    then TIME_COLOR=250m;   # < less than 1 day old
-    elif [[ $TIME_DIFF -lt 604800 ]];   then TIME_COLOR=244m;   # < less than 1 week old
-    elif [[ $TIME_DIFF -lt 2419200 ]];  then TIME_COLOR=244m;   # < less than 28 days (4 weeks) old
-    elif [[ $TIME_DIFF -lt 15724800 ]]; then TIME_COLOR=242m;   # < less than 26 weeks (6 months) old
-    elif [[ $TIME_DIFF -lt 31449600 ]]; then TIME_COLOR=240m;   # < less than 1 year old
-    elif [[ $TIME_DIFF -lt 62899200 ]]; then TIME_COLOR=238m;   # < less than 2 years old
-    else                                     TIME_COLOR=236m;   # > more than 2 years old
-    fi;
+    TIME_DIFF=$(( K_EPOCH - DATE[1] ))
+    TIME_COLOR=$ANCIENT_TIME_COLOR
+    for i j in ${FILEAGES_TO_COLOR[@]}
+    do
+      (( TIME_DIFF < i )) || continue
+      TIME_COLOR=$j
+      break
+    done
 
     # Format date to show year if more than 6 months since last modified
-    if [[ $TIME_DIFF -lt 15724800 ]]; then
-      DATE_OUTPUT=$DATE[2]" "$DATE[3]" "$DATE[4]
-      else
-      DATE_OUTPUT=$DATE[2]" "$DATE[3]"  "$DATE[5]
+    if (( TIME_DIFF < 15724800 )); then
+      DATE_OUTPUT="${DATE[2]} ${DATE[3]} ${DATE[4]}"
+    else
+      DATE_OUTPUT="${DATE[2]} ${DATE[3]}  ${DATE[5]}"  # extra space; 4 digit year instead of 5 digit HH:MM
     fi;
-    DATE_OUTPUT[1]=${DATE_OUTPUT[1]//0/" "} # If day of month begins with zero, replace zero with space
+    DATE_OUTPUT[1]="${DATE_OUTPUT[1]//0/ }" # If day of month begins with zero, replace zero with space
 
     # Apply colour to formated date
-    DATE_OUTPUT="\033[38;5;$TIME_COLOR$DATE_OUTPUT\033[0m"
+    DATE_OUTPUT=$'\e[38;5;'"${TIME_COLOR}m${DATE_OUTPUT}"$'\e[0m'
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the repomarker
     # ------------------------------------------------------------------------------------------------------------------------
-     # Check for git repo, first checking if the result is a directory
-    if [[ ($IS_GIT_REPO == false || $k == 1 || $k == 2) && ($IS_DIRECTORY == true || $IS_SYMLINK == true && $IS_DIRECTORY == true) ]] # if a directory
+    # Check for git repo, first checking if the result is a directory
+    if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
+    then
+      if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
       then
-      if [[ -d $NAME"/.git" ]] # if contains a git folder
-        then
-        if command git --git-dir=`pwd`/$NAME/.git --work-tree=`pwd`/$NAME diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-          then REPOMARKER="\033[0;32m|\033[0m" # Show a green vertical bar for dirty
-          else REPOMARKER="\033[0;31m|\033[0m" # Show a red vertical bar if clean
+        if command git --git-dir="$PWD/$NAME/.git" --work-tree="$PWD/$NAME" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+          then REPOMARKER=$'\e[0;32m|\e[0m' # Show a green vertical bar for dirty
+          else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
         fi
       fi
     fi
 
-    if [[ $IS_GIT_REPO == true && $k != 1 && $k != 2 && $NAME != '.git' ]]
+    if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
       then
-      STATUS=$(command git status --porcelain --ignored --untracked-files="normal" $NAME);
-      STATUS=$STATUS[1,2]
-        if [[ $STATUS == ' M' ]]; then REPOMARKER="\033[0;31m|\033[0m";     # Modified
-      elif [[ $STATUS == '??' ]]; then REPOMARKER="\033[38;5;214m|\033[0m"; # Untracked
-      elif [[ $STATUS == '!!' ]]; then REPOMARKER="\033[38;5;238m|\033[0m"; # Ignored
-      elif [[ $STATUS == 'A ' ]]; then REPOMARKER="\033[38;5;093m|\033[0m"; # Added
-      else                             REPOMARKER="\033[0;32m|\033[0m";     # Good
+      STATUS="$(command git status --porcelain --ignored --untracked-files=normal "$NAME")"
+      STATUS="${STATUS[1,2]}"
+        if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
+      elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
+      elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
+      elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
+      else                             REPOMARKER=$'\e[0;32m|\e[0m';     # Good
       fi
     fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Colour the filename
     # ------------------------------------------------------------------------------------------------------------------------
-    if [[ $IS_DIRECTORY == true ]]
-      then
-      NAME="\033[1;36m"$NAME"\033[0m"
-    elif [[ $IS_SYMLINK == true ]];
-      then
-      NAME="\033[0;35m"$NAME"\033[0m"
+    # Unfortunately, the choices for quoting which escape ANSI color sequences are q & qqqq; none of q- qq qqq work.
+    # But we don't want to quote '.'; so instead we escape the escape manually and use q-
+    NAME="${(q-)NAME//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
+    if (( IS_DIRECTORY ))
+    then
+      NAME=$'\e[1;36m'"$NAME"$'\e[0m'
+    elif (( IS_SYMLINK ))
+    then
+      NAME=$'\e[0;35m'"$NAME"$'\e[0m'
     fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Format symlink target
     # ------------------------------------------------------------------------------------------------------------------------
-    if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> "$SYMLINK_TARGET; fi
+    if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> ${(q-)SYMLINK_TARGET//$'\e'/\\e}"; fi
 
     # ------------------------------------------------------------------------------------------------------------------------
     # Display final result
     # ------------------------------------------------------------------------------------------------------------------------
-    echo $PERMISSIONS_OUTPUT " "$SYMLINKS $OWNER " "$GROUP " "$FILESIZE $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET
+    print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
 
     k=$((k+1)) # Bump loop index
   done
-  TERM=$OLD_TERM
+
+  # cleanup / recovery
+  TERM="$OLD_TERM"
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
+# vim: set ft=zsh et :
