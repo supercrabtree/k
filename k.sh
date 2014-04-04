@@ -74,7 +74,7 @@ k () {
   do
     statvar="stats_$i"
     typeset -A $statvar
-    zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" "$fn"  # use lstat, render mode/uid/gid to strings
+    zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
     STATS_PARAMS_LIST+=($statvar)
     TOTAL_BLOCKS+=${statvar[blocks]}
     i+=1
