@@ -53,6 +53,11 @@ k
 
 profit
 
+## Requirements
+zsh >= 4.3.10 (may work for earlier versions; this is the oldest tested)
+Git >= 1.7.2
+
+
 ## Thanks
 [Paul Falstad](http://www.falstad.com/) for zsh  
 [Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
