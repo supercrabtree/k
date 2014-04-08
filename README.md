@@ -53,9 +53,9 @@ k
 
 profit
 
-## Requirements
-zsh >= 4.3.11
-Git >= 1.7.2
+## Minimum Requirements
+zsh 4.3.11  
+Git 1.7.2
 
 
 ## Thanks
