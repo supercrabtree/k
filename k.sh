@@ -71,21 +71,7 @@ k () {
   typeset fn statvar
   typeset -A sv
 
-  # Dump files into an Array
-  typeset -a FILES
-
-  for file
-  do
-    # If a directory argument is given set the FILES Array relative to that directory and ignore everything else
-    if [[ -d "$file" ]]; then FILES=( $file/. $file/.. $file/*(D) ); break; fi
-    # If a plain file argument is given set the FILES Array to just that file
-    if [[ -f "$file" ]]; then FILES+=( $file ); fi
-  done
-  # Default to the current directory
-  if [[ $#FILES == 0 ]]; then FILES=( . .. *(D) ); fi
-
-
-  for fn in $FILES
+  for fn in . .. *(D)
   do
     statvar="stats_$i"
     typeset -A $statvar
@@ -145,7 +131,7 @@ k () {
     if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
     # is this a git repo
-    if [[ $k == 1 && $(cd $NAME:h; command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
+    if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
       then
       IS_GIT_REPO=1
     fi;
@@ -241,7 +227,7 @@ k () {
     # Colour the repomarker
     # ------------------------------------------------------------------------------------------------------------------------
     # Check for git repo, first checking if the result is a directory
-    if (( IS_GIT_REPO == 0)) || [[ $NAME:t == '.' ]] || [[ $NAME:t == '..' ]] 
+    if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
     then
       if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
       then
@@ -252,7 +238,7 @@ k () {
       fi
     fi
 
-    if (( IS_GIT_REPO )) && ( [[ $NAME:t != '.' ]] && [[ $NAME:t != '..' ]] ) && [[ "$NAME" != '.git' ]]
+    if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
       then
       STATUS="$(command git status --porcelain --ignored --untracked-files=normal "$NAME")"
       STATUS="${STATUS[1,2]}"
@@ -270,8 +256,6 @@ k () {
     # Unfortunately, the choices for quoting which escape ANSI color sequences are q & qqqq; none of q- qq qqq work.
     # But we don't want to quote '.'; so instead we escape the escape manually and use q-
     NAME="${(q-)NAME//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
-
-    NAME=$NAME:t # Remove dirname just like ls does
 
     if (( IS_DIRECTORY ))
     then
