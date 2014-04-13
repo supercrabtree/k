@@ -214,9 +214,9 @@ k () {
 
     # Format date to show year if more than 6 months since last modified
     if (( TIME_DIFF < 15724800 )); then
-      DATE_OUTPUT="${DATE[2]} ${DATE[3]} ${DATE[4]}"
+      DATE_OUTPUT="${DATE[2]} ${(r:5:: :)${DATE[3][0,5]}} ${DATE[4]}"
     else
-      DATE_OUTPUT="${DATE[2]} ${DATE[3]}  ${DATE[5]}"  # extra space; 4 digit year instead of 5 digit HH:MM
+      DATE_OUTPUT="${DATE[2]} ${(r:6:: :)${DATE[3][0,5]}} ${DATE[5]}"  # extra space; 4 digit year instead of 5 digit HH:MM
     fi;
     DATE_OUTPUT[1]="${DATE_OUTPUT[1]//0/ }" # If day of month begins with zero, replace zero with space
 
