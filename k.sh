@@ -2,9 +2,9 @@ zmodload zsh/datetime
 zmodload -F zsh/stat b:zstat
 
 k () {
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Setup
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   # Stop stat failing when a directory contains either no files or no hidden files
   # Track if we _accidentally_ create a new global variable
@@ -14,8 +14,9 @@ k () {
   typeset OLD_TERM="$TERM"
   TERM='xterm-256color'
 
-  # ---------------------------------
+  # ----------------------------------------------------------------------------
   # Vars
+  # ----------------------------------------------------------------------------
 
   typeset -a MAX_LEN A RESULTS STAT_RESULTS
   typeset TOTAL_BLOCKS
@@ -61,9 +62,9 @@ k () {
     62899200 238  # < less than 2 years old
     )
 
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Stat call to get directory listing
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   # Break total blocks of the front of the stat call, then push the rest to results
   typeset -i i=1 j=1 k=1
@@ -95,9 +96,9 @@ k () {
     if [[ ${#sv[size]}  -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}  ; fi
   done
 
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
   # Loop through each line of stat, pad where appropriate and do git dirty checking
-  # --------------------------------------------------------------------------
+  # ----------------------------------------------------------------------------
 
   typeset REPOMARKER
   typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE DATE NAME SYMLINK_TARGET
