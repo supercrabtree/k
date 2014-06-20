@@ -78,12 +78,9 @@ k () {
     typeset -A $statvar
     zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
     STATS_PARAMS_LIST+=($statvar)
-    TOTAL_BLOCKS+=${statvar[blocks]}
     i+=1
   done
 
-  # Print total block before listing
-  echo "total $TOTAL_BLOCKS"
 
   # On each result calculate padding by getting max length on each array member
   for statvar in "${STATS_PARAMS_LIST[@]}"
@@ -94,7 +91,11 @@ k () {
     if [[ ${#sv[uid]}   -gt $MAX_LEN[3] ]]; then MAX_LEN[3]=${#sv[uid]}   ; fi
     if [[ ${#sv[gid]}   -gt $MAX_LEN[4] ]]; then MAX_LEN[4]=${#sv[gid]}   ; fi
     if [[ ${#sv[size]}  -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}  ; fi
+    TOTAL_BLOCKS+=$sv[blocks]
   done
+
+  # Print total block before listing
+  echo "total $TOTAL_BLOCKS"
 
   # ----------------------------------------------------------------------------
   # Loop through each line of stat, pad where appropriate and do git dirty checking
