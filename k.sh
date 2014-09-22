@@ -234,7 +234,7 @@ k () {
       if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
       then
         if command git --git-dir="$PWD/$NAME/.git" --work-tree="$PWD/$NAME" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-          then REPOMARKER=$'\e[0;32m|\e[0m' # Show a green vertical bar for dirty
+          then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
           else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
         fi
       fi
@@ -248,7 +248,7 @@ k () {
       elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
       elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
       elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
-      else                             REPOMARKER=$'\e[0;32m|\e[0m';     # Good
+      else                             REPOMARKER=$'\e[38;5;082m|\e[0m';     # Good
       fi
     fi
 
@@ -261,7 +261,7 @@ k () {
 
     if (( IS_DIRECTORY ))
     then
-      NAME=$'\e[1;36m'"$NAME"$'\e[0m'
+      NAME=$'\e[38;5;32m'"$NAME"$'\e[0m'
     elif (( IS_SYMLINK ))
     then
       NAME=$'\e[0;35m'"$NAME"$'\e[0m'
