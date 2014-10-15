@@ -67,4 +67,6 @@ Git 1.7.2
 ## Contributing
 Pull requests welcome.
 
+Would really like to make this posix complient so that it can be used with bash, and others. But don't really know anything about shell scripting, so if you think you could help that would be cooool :)
+
 Copyright © 2014 George Crabtree & Christopher Newton. MIT License
