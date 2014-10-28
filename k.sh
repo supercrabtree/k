@@ -72,7 +72,69 @@ k () {
   typeset fn statvar
   typeset -A sv
 
-  for fn in . .. *(D)
+  # Process options and get files/directories
+  # Options:
+  # -a      --all           list entries starting with .
+  # -A      --almost-all    list all except . and ..
+  # -d      --directory     list directory entries instead of contents
+  # -n      --no-directory  do not list directories
+  # -h      --help          show this help
+  typeset -a o_all o_almost_all o_directory o_no_directory o_help
+  zparseopts -E -D \
+             a=o_all -all=o_all \
+             A=o_almost_all -almost-all=o_almost_all \
+             d=o_directory -directory=o_directory \
+             n=o_no_directory -no-directory=o_no_directory \
+             h=o_help -help=o_help
+
+  # Print Help if bad usage, or they asked for it
+  if [[ $? != 0 || "$o_help" != "" ]]; then
+      print "Usage: k [options] DIR"
+      print "Options:"
+      print "\t-a      --all           list entries starting with ."
+      print "\t-A      --almost-all    list all except . and .."
+      print "\t-d      --directory     list directory entries instead of contents"
+      print "\t-h      --help          show this help"
+      print "\t-n      --no-directory  do not list directories"
+      return 1
+  fi
+
+  # Check for conflicts
+  if [[ "$o_directory" != "" && "$o_no_directory" != "" ]]; then
+    print "$o_directory and $o_no_directory cannot be used together" 1>&2
+    return 1
+  fi
+
+  typeset -a show_base_dir show_list
+
+  show_base_dir=${1:-.}
+
+  if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
+    show_list+=($show_base_dir/.)
+    show_list+=($show_base_dir/..)
+  fi
+
+  if [[ "$o_all" != "" ]]; then
+    if [[ "$o_directory" != "" ]]; then
+      show_list+=($show_base_dir/*(D/))
+    elif [[ "$o_no_directory" != "" ]]; then
+      #Use (^/) instead of (.) so sockets and symlinks get displayed
+      show_list+=($show_base_dir/*(D^/))
+    else
+      show_list+=($show_base_dir/*(D))
+    fi
+  else
+    if [[ "$o_directory" != "" ]]; then
+      show_list+=($show_base_dir/*(/))
+    elif [[ "$o_no_directory" != "" ]]; then
+      #Use (^/) instead of (.) so sockets and symlinks get displayed
+      show_list+=($show_base_dir/*(^/))
+    else
+      show_list+=($show_base_dir/*)
+    fi
+  fi
+
+  for fn in $show_list
   do
     statvar="stats_$i"
     typeset -A $statvar
@@ -133,10 +195,12 @@ k () {
     if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
     # is this a git repo
+    [[ $IS_DIRECTORY ]] && cd $show_base_dir || cd $(dirname $show_base_dir)
     if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
       then
       IS_GIT_REPO=1
     fi;
+    cd - >/dev/null
 
     # Pad so all the lines align - firstline gets padded the other way
       PERMISSIONS="${(r:MAX_LEN[1]:)PERMISSIONS}"
@@ -285,4 +349,4 @@ k () {
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
-# vim: set ft=zsh et :
+# vim: set ts=2 sw=2 ft=zsh et :
