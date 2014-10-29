@@ -124,6 +124,7 @@ k () {
     # ----------------------------------------------------------------------------
 
     typeset -a show_list
+    show_list=()
     # Break total blocks of the front of the stat call, then push the rest to results
     if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
       show_list+=($base_dir/.)
@@ -165,6 +166,7 @@ k () {
     typeset fn statvar
     typeset -A sv
 
+    STATS_PARAMS_LIST=()
     for fn in $show_list
     do
       if [[ "$+commands[realpath]" != 0 ]]; then
