@@ -169,7 +169,9 @@ k () {
     STATS_PARAMS_LIST=()
     for fn in $show_list
     do
-      if [[ "$+commands[realpath]" != 0 ]]; then
+      if [[ "${fn##*/}" =~ '^\.{1,2}$' ]]; then
+        fn=${fn%/*}/${fn##*/}
+      elif [[ "$+commands[realpath]" != 0 ]]; then
         fn=$(realpath --relative-to=. -es $fn)
       fi
       statvar="stats_$i"
@@ -364,7 +366,7 @@ k () {
       # --------------------------------------------------------------------------
       # Unfortunately, the choices for quoting which escape ANSI color sequences are q & qqqq; none of q- qq qqq work.
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
-      NAME="${(q-)NAME//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
+      NAME="${(q-)${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
       if (( IS_DIRECTORY ))
       then
