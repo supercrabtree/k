@@ -231,7 +231,7 @@ k () {
       if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
       # is this a git repo
-      [[ $IS_DIRECTORY ]] && cd $show_base_dir || cd $(dirname $show_base_dir)
+      [[ $IS_DIRECTORY ]] && cd $base_dir || cd $(dirname $base_dir)
       if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
         then
         IS_GIT_REPO=1
@@ -333,11 +333,14 @@ k () {
       # Colour the repomarker
       # --------------------------------------------------------------------------
       # Check for git repo, first checking if the result is a directory
+      typeset DIR DOTTEDNAME
+      DOTTEDNAME=./$NAME
+      DIR=${DOTTEDNAME%/*} # Does the same as $(dirname $NAME)
       if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
       then
         if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
         then
-          if command git --git-dir="$PWD/$NAME/.git" --work-tree="$PWD/$NAME" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+          if command git --git-dir="${NAME}/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
             then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
             else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
           fi
@@ -345,8 +348,8 @@ k () {
       fi
 
       if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
-        then
-        STATUS="$(command git status --porcelain --ignored --untracked-files=normal "$NAME")"
+      then
+        STATUS="$(command git --git-dir=${DIR}/.git --work-tree=${DIR} status --porcelain --ignored --untracked-files=normal "${NAME##*/}")"
         STATUS="${STATUS[1,2]}"
           if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
         elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
