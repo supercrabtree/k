@@ -271,10 +271,14 @@ k () {
       PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
 
       # --x --x --x warning
-      if [[ $PER1[3] == "x" || $PER2[3] == "x" || $PER3[3] == "x" ]]; then IS_EXECUTABLE=1; fi
+      if [[ $PER1[3] == "x" || $PER2[3] == "x" || $PER3[3] == "x" ]]; then
+        IS_EXECUTABLE=1
+      fi
 
       # --- --- rwx warning
-      if [[ $PER3 == "rwx" ]]; then PERMISSIONS_OUTPUT=$'\e[30;41m'"$PERMISSIONS"$'\e[0m'; fi
+      if [[ $PER3 == "rwx" && ! IS_SYMLINK ]]; then
+        PERMISSIONS_OUTPUT=$'\e[30;41m'"$PERMISSIONS"$'\e[0m'
+      fi
 
       # --------------------------------------------------------------------------
       # Colour the symlinks - TODO
