@@ -10,10 +10,6 @@ k () {
   # Track if we _accidentally_ create a new global variable
   setopt local_options null_glob warn_create_global
 
-  # Turn on 256 colour terminal, not sure this works at all.
-  typeset OLD_TERM="$TERM"
-  TERM='xterm-256color'
-
   # ----------------------------------------------------------------------------
   # Vars
   # ----------------------------------------------------------------------------
@@ -280,8 +276,6 @@ k () {
     k=$((k+1)) # Bump loop index
   done
 
-  # cleanup / recovery
-  TERM="$OLD_TERM"
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
