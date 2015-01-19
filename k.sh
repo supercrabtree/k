@@ -18,12 +18,13 @@ k () {
   # -h      --human         display sizes in human readable form
   # -n      --no-directory  do not list directories
   #         --help          show this help
-  typeset -a o_all o_almost_all o_human o_directory o_no_directory o_help
+  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_help
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
              d=o_directory -directory=o_directory \
-	     h=o_human -human=o_human \
+             h=o_human -human=o_human \
+             -si=o_si \
              n=o_no_directory -no-directory=o_no_directory \
              -help=o_help
 
@@ -37,6 +38,7 @@ k () {
     print -u2 "\t-d      --directory     list only directories"
     print -u2 "\t-n      --no-directory  do not list directories"
     print -u2 "\t-h      --human         show filesizes in human-readable format"
+    print -u2 "\t        --si            with -h, use powers of 1000 not 1024"
     print -u2 "\t        --help          show this help"
     return 1
   fi
@@ -54,6 +56,15 @@ k () {
     # Set o_human to off
     o_human=""
   fi
+
+  # Create numfmt local function
+  numfmt_local () {
+    if [[ "$o_si" != "" ]]; then
+      numfmt --to=si $1
+    else
+      numfmt --to=iec $1
+    fi
+  }
 
   # Setup array of directories to print
   typeset -a base_dirs
@@ -136,7 +147,7 @@ k () {
 
     # Check if it even exists
     if [[ ! -e $base_dir ]]; then
-	print -u2 "k: cannot access $base_dir: No such file or directory"
+  print -u2 "k: cannot access $base_dir: No such file or directory"
 
     # If its just a file, skip the directory handling
     elif [[ -f $base_dir ]]; then
@@ -201,10 +212,10 @@ k () {
       if [[ ${#sv[gid]}   -gt $MAX_LEN[4] ]]; then MAX_LEN[4]=${#sv[gid]}   ; fi
 
       if [[ "$o_human" != "" ]]; then
-	h=$(numfmt --to=iec ${sv[size]})
-	if (( ${#h} > $MAX_LEN[5] )); then MAX_LEN[5]=${#h}; fi
+        h=$(numfmt_local ${sv[size]})
+        if (( ${#h} > $MAX_LEN[5] )); then MAX_LEN[5]=${#h}; fi
       else
-	if [[ ${#sv[size]} -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}; fi
+        if [[ ${#sv[size]} -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}; fi
       fi
 
       TOTAL_BLOCKS+=$sv[blocks]
@@ -258,11 +269,11 @@ k () {
 
       # Get human readable output if necessary
       if [[ "$o_human" != "" ]]; then
-	# I hate making this call twice, but its either that, or do a bunch
-	# of calculations much earlier.
-	FILESIZE_OUT=$(numfmt --to=iec $FILESIZE)
+        # I hate making this call twice, but its either that, or do a bunch
+        # of calculations much earlier.
+        FILESIZE_OUT=$(numfmt_local $FILESIZE)
       else
-	FILESIZE_OUT=$FILESIZE
+        FILESIZE_OUT=$FILESIZE
       fi
 
       # Pad so all the lines align - firstline gets padded the other way
