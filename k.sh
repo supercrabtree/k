@@ -11,14 +11,7 @@ k () {
   setopt local_options null_glob warn_create_global typeset_silent
 
   # Process options and get files/directories
-  # Options:
-  # -a      --all           list entries starting with .
-  # -A      --almost-all    list all except . and ..
-  # -d      --directory     list directory entries instead of contents
-  # -h      --human         display sizes in human readable form
-  # -n      --no-directory  do not list directories
-  #         --help          show this help
-  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_help
+  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
@@ -26,6 +19,7 @@ k () {
              h=o_human -human=o_human \
              -si=o_si \
              n=o_no_directory -no-directory=o_no_directory \
+             -no-vcs=o_no_vcs \
              -help=o_help
 
   # Print Help if bad usage, or they asked for it
@@ -39,6 +33,7 @@ k () {
     print -u2 "\t-n      --no-directory  do not list directories"
     print -u2 "\t-h      --human         show filesizes in human-readable format"
     print -u2 "\t        --si            with -h, use powers of 1000 not 1024"
+    print -u2 "\t        --no-vcs        do not get VCS status (much faster)"
     print -u2 "\t        --help          show this help"
     return 1
   fi
@@ -260,12 +255,16 @@ k () {
       if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
       # is this a git repo
-      (( IS_DIRECTORY )) && cd $base_dir || cd $(dirname $base_dir)
-      if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
-        then
-        IS_GIT_REPO=1
-      fi;
-      cd - >/dev/null
+      if [[ "o_no_vcs" != "" ]]; then
+        IS_GIT_REPO=0
+      else
+        (( IS_DIRECTORY )) && cd $base_dir || cd $(dirname $base_dir)
+        if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
+          then
+          IS_GIT_REPO=1
+        fi
+        cd - >/dev/null
+      fi
 
       # Get human readable output if necessary
       if [[ "$o_human" != "" ]]; then
@@ -370,30 +369,34 @@ k () {
       # --------------------------------------------------------------------------
       # Colour the repomarker
       # --------------------------------------------------------------------------
-      # Check for git repo, first checking if the result is a directory
-      typeset DIR DOTTEDNAME
-      DOTTEDNAME=./$NAME
-      DIR=${DOTTEDNAME%/*} # Does the same as $(dirname $NAME)
-      if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
-      then
-        if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
+      if [[ "$o_no_vcs" != "" ]]; then
+	REPOMARKER=""
+      else
+        # Check for git repo, first checking if the result is a directory
+        typeset DIR DOTTEDNAME
+        DOTTEDNAME=./$NAME
+        DIR=${DOTTEDNAME%/*} # Does the same as $(dirname $NAME)
+        if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
         then
-          if command git --git-dir="${NAME}/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-            then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
-            else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
+          if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
+          then
+            if command git --git-dir="${NAME}/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+              then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
+              else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
+            fi
           fi
         fi
-      fi
 
-      if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
-      then
-        STATUS="$(command git --git-dir=${DIR}/.git --work-tree=${DIR} status --porcelain --ignored --untracked-files=normal "${NAME##*/}")"
-        STATUS="${STATUS[1,2]}"
-          if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
-        elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
-        elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-        elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
-        else                             REPOMARKER=$'\e[38;5;082m|\e[0m';     # Good
+        if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
+        then
+          STATUS="$(command git --git-dir=${DIR}/.git --work-tree=${DIR} status --porcelain --ignored --untracked-files=normal "${NAME##*/}")"
+          STATUS="${STATUS[1,2]}"
+            if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
+          elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
+          elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
+          elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
+          else                             REPOMARKER=$'\e[38;5;082m|\e[0m';     # Good
+          fi
         fi
       fi
 
