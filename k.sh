@@ -176,11 +176,7 @@ k () {
     STATS_PARAMS_LIST=()
     for fn in $show_list
     do
-      if [[ "${fn##*/}" =~ '^\.{1,2}$' ]]; then
-        fn=${fn%/*}/${fn##*/}
-      elif [[ "$+commands[realpath]" != 0 ]]; then
-        fn=$(realpath --relative-to=. -es $fn)
-      fi
+      fn=${fn%/*}/${fn##*/}
       statvar="stats_$i"
       typeset -A $statvar
       zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
