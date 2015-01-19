@@ -151,7 +151,7 @@ k () {
     #Directory, add its contents
     else
       # Break total blocks of the front of the stat call, then push the rest to results
-      if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
+      if [[ "$o_all" != "" && "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
         show_list+=($base_dir/.)
         show_list+=($base_dir/..)
       fi
