@@ -19,27 +19,30 @@ k () {
   # -a      --all           list entries starting with .
   # -A      --almost-all    list all except . and ..
   # -d      --directory     list directory entries instead of contents
+  # -h      --human         display sizes in human readable form
   # -n      --no-directory  do not list directories
-  # -h      --help          show this help
-  typeset -a o_all o_almost_all o_directory o_no_directory o_help
+  #         --help          show this help
+  typeset -a o_all o_almost_all o_human o_directory o_no_directory o_help
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
              d=o_directory -directory=o_directory \
+	     h=o_human -human=o_human \
              n=o_no_directory -no-directory=o_no_directory \
-             h=o_help -help=o_help
+             -help=o_help
 
   # Print Help if bad usage, or they asked for it
   if [[ $? != 0 || "$o_help" != "" ]]
   then
-      print "Usage: k [options] DIR"
-      print "Options:"
-      print "\t-a      --all           list entries starting with ."
-      print "\t-A      --almost-all    list all except . and .."
-      print "\t-d      --directory     list directory entries instead of contents"
-      print "\t-h      --help          show this help"
-      print "\t-n      --no-directory  do not list directories"
-      return 1
+    print -u2 "Usage: k [options] DIR"
+    print -u2 "Options:"
+    print -u2 "\t-a      --all           list entries starting with ."
+    print -u2 "\t-A      --almost-all    list all except . and .."
+    print -u2 "\t-d      --directory     list directory entries instead of contents"
+    print -u2 "\t-n      --no-directory  do not list directories"
+    print -u2 "\t-h      --human         show filesizes in human-readable format"
+    print -u2 "\t        --help          show this help"
+    return 1
   fi
 
   # Check for conflicts
@@ -48,6 +51,15 @@ k () {
     return 1
   fi
 
+  # Check for the command numfmt, warn user if not available
+  if [[ "$o_human" != "" && $+commands[numfmt] == 0 ]]; then
+    print -u2 "'numfmt' command not found, human readable output will not work."
+    print -u2 "\tFalling back to normal file size output"
+    # Set o_human to off
+    o_human=""
+  fi
+
+  # Setup array of directories to print
   typeset -a base_dirs
 
   if [[ "$@" == "" ]]; then
@@ -163,7 +175,7 @@ k () {
     # ----------------------------------------------------------------------------
     typeset -i i=1 j=1 k=1
     typeset -a STATS_PARAMS_LIST
-    typeset fn statvar
+    typeset fn statvar h
     typeset -A sv
 
     STATS_PARAMS_LIST=()
@@ -190,7 +202,14 @@ k () {
       if [[ ${#sv[nlink]} -gt $MAX_LEN[2] ]]; then MAX_LEN[2]=${#sv[nlink]} ; fi
       if [[ ${#sv[uid]}   -gt $MAX_LEN[3] ]]; then MAX_LEN[3]=${#sv[uid]}   ; fi
       if [[ ${#sv[gid]}   -gt $MAX_LEN[4] ]]; then MAX_LEN[4]=${#sv[gid]}   ; fi
-      if [[ ${#sv[size]}  -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}  ; fi
+
+      if [[ "$o_human" != "" ]]; then
+	h=$(numfmt --to=iec ${sv[size]})
+	if (( ${#h} > $MAX_LEN[5] )); then MAX_LEN[5]=${#h}; fi
+      else
+	if [[ ${#sv[size]} -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}; fi
+      fi
+
       TOTAL_BLOCKS+=$sv[blocks]
     done
 
@@ -202,7 +221,7 @@ k () {
     # ----------------------------------------------------------------------------
 
     typeset REPOMARKER
-    typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE DATE NAME SYMLINK_TARGET
+    typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE FILESIZE_OUT DATE NAME SYMLINK_TARGET
     typeset FILETYPE PER1 PER2 PER3 PERMISSIONS_OUTPUT STATUS
     typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
     typeset -i IS_DIRECTORY IS_SYMLINK IS_EXECUTABLE
@@ -240,12 +259,21 @@ k () {
       fi;
       cd - >/dev/null
 
+      # Get human readable output if necessary
+      if [[ "$o_human" != "" ]]; then
+	# I hate making this call twice, but its either that, or do a bunch
+	# of calculations much earlier.
+	FILESIZE_OUT=$(numfmt --to=iec $FILESIZE)
+      else
+	FILESIZE_OUT=$FILESIZE
+      fi
+
       # Pad so all the lines align - firstline gets padded the other way
         PERMISSIONS="${(r:MAX_LEN[1]:)PERMISSIONS}"
       HARDLINKCOUNT="${(l:MAX_LEN[2]:)HARDLINKCOUNT}"
               OWNER="${(l:MAX_LEN[3]:)OWNER}"
               GROUP="${(l:MAX_LEN[4]:)GROUP}"
-           FILESIZE="${(l:MAX_LEN[5]:)FILESIZE}"
+       FILESIZE_OUT="${(l:MAX_LEN[5]:)FILESIZE_OUT}"
 
       # --------------------------------------------------------------------------
       # Colour the permissions - TODO
@@ -305,7 +333,7 @@ k () {
         break
       done
 
-      FILESIZE=$'\e[38;5;'"${COLOR}m$FILESIZE"$'\e[0m'
+      FILESIZE_OUT=$'\e[38;5;'"${COLOR}m$FILESIZE_OUT"$'\e[0m'
 
       # --------------------------------------------------------------------------
       # Colour the date and time based on age, then format for output
@@ -384,7 +412,7 @@ k () {
       # --------------------------------------------------------------------------
       # Display final result
       # --------------------------------------------------------------------------
-      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
+      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
 
       k=$((k+1)) # Bump loop index
     done
