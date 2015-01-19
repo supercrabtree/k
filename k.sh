@@ -150,7 +150,7 @@ k () {
         show_list+=($base_dir/..)
       fi
 
-      if [[ "$o_all" != "" ]]; then
+      if [[ "$o_all" != "" || "$o_almost_all" != "" ]]; then
         if [[ "$o_directory" != "" ]]; then
           show_list+=($base_dir/*(D/))
         elif [[ "$o_no_directory" != "" ]]; then
