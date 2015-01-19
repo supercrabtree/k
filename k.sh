@@ -47,7 +47,7 @@ k () {
 
   # Check for conflicts
   if [[ "$o_directory" != "" && "$o_no_directory" != "" ]]; then
-    print "$o_directory and $o_no_directory cannot be used together" 1>&2
+    print -u2 "$o_directory and $o_no_directory cannot be used together"
     return 1
   fi
 
@@ -137,36 +137,35 @@ k () {
 
     typeset -a show_list
     show_list=()
-    # Break total blocks of the front of the stat call, then push the rest to results
-    if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
-      show_list+=($base_dir/.)
-      show_list+=($base_dir/..)
-    fi
 
-    if [[ "$o_all" != "" ]]; then
-      if [[ "$o_directory" != "" ]]; then
-        show_list+=($base_dir/*(D/))
-
-      elif [[ "$o_no_directory" != "" ]]; then
-        #Use (^/) instead of (.) so sockets and symlinks get displayed
-        show_list+=($base_dir/*(D^/))
-
-      else
-        show_list+=($base_dir/*(D))
-
+    # If its just a file, skip the directory handling
+    if [[ -f $base_dir ]]; then
+      show_list=($base_dir)
+    else
+      # Break total blocks of the front of the stat call, then push the rest to results
+      if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
+        show_list+=($base_dir/.)
+        show_list+=($base_dir/..)
       fi
 
-    else
-      if [[ "$o_directory" != "" ]]; then
-        show_list+=($base_dir/*(/))
-
-      elif [[ "$o_no_directory" != "" ]]; then
-        #Use (^/) instead of (.) so sockets and symlinks get displayed
-        show_list+=($base_dir/*(^/))
-
+      if [[ "$o_all" != "" ]]; then
+        if [[ "$o_directory" != "" ]]; then
+          base_dir/*(D/))
+        elif [[ "$o_no_directory" != "" ]]; then
+          #Use (^/) instead of (.) so sockets and symlinks get displayed
+          show_list+=($base_dir/*(D^/))
+        else
+          show_list+=($base_dir/*(D))
+        fi
       else
-        show_list+=($base_dir/*)
-
+        if [[ "$o_directory" != "" ]]; then
+          show_list+=($base_dir/*(/))
+        elif [[ "$o_no_directory" != "" ]]; then
+          #Use (^/) instead of (.) so sockets and symlinks get displayed
+          show_list+=($base_dir/*(^/))
+        else
+          show_list+=($base_dir/*)
+        fi
       fi
     fi
 
@@ -252,7 +251,7 @@ k () {
       if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
       # is this a git repo
-      [[ $IS_DIRECTORY ]] && cd $base_dir || cd $(dirname $base_dir)
+      (( IS_DIRECTORY )) && cd $base_dir || cd $(dirname $base_dir)
       if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
         then
         IS_GIT_REPO=1
