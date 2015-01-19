@@ -150,7 +150,7 @@ k () {
 
       if [[ "$o_all" != "" ]]; then
         if [[ "$o_directory" != "" ]]; then
-          base_dir/*(D/))
+          show_list+=($base_dir/*(D/))
         elif [[ "$o_no_directory" != "" ]]; then
           #Use (^/) instead of (.) so sockets and symlinks get displayed
           show_list+=($base_dir/*(D^/))
