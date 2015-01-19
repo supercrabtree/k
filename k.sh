@@ -134,9 +134,15 @@ k () {
     typeset -a show_list
     show_list=()
 
+    # Check if it even exists
+    if [[ ! -e $base_dir ]]; then
+	print -u2 "k: cannot access $base_dir: No such file or directory"
+
     # If its just a file, skip the directory handling
-    if [[ -f $base_dir ]]; then
+    elif [[ -f $base_dir ]]; then
       show_list=($base_dir)
+
+    #Directory, add its contents
     else
       # Break total blocks of the front of the stat call, then push the rest to results
       if [[ "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
