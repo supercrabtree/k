@@ -34,7 +34,7 @@ k () {
     print -u2 "Options:"
     print -u2 "\t-a      --all           list entries starting with ."
     print -u2 "\t-A      --almost-all    list all except . and .."
-    print -u2 "\t-d      --directory     list directory entries instead of contents"
+    print -u2 "\t-d      --directory     list only directories"
     print -u2 "\t-n      --no-directory  do not list directories"
     print -u2 "\t-h      --human         show filesizes in human-readable format"
     print -u2 "\t        --help          show this help"
