@@ -102,8 +102,9 @@ k () {
     # Array to hold results from `stat` call
     RESULTS=()
 
-    # only set once so must be out of the main loop
+    # only set once per directory so must be out of the main loop
     typeset -i IS_GIT_REPO=0
+    typeset GIT_TOPLEVEL
 
     typeset -i LARGE_FILE_COLOR=196
     typeset -a SIZELIMITS_TO_COLOR
@@ -142,7 +143,7 @@ k () {
 
     # Check if it even exists
     if [[ ! -e $base_dir ]]; then
-  print -u2 "k: cannot access $base_dir: No such file or directory"
+      print -u2 "k: cannot access $base_dir: No such file or directory"
 
     # If its just a file, skip the directory handling
     elif [[ -f $base_dir ]]; then
@@ -188,7 +189,6 @@ k () {
     STATS_PARAMS_LIST=()
     for fn in $show_list
     do
-      fn=${fn%/*}/${fn##*/}
       statvar="stats_$i"
       typeset -A $statvar
       zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
@@ -254,14 +254,23 @@ k () {
       if [[ -d "$NAME" ]]; then IS_DIRECTORY=1; fi
       if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
 
+      # IS_GIT_REPO is a 1 if $NAME is a file/directory in a git repo, OR if $NAME is a git-repo itself
+      # GIT_TOPLEVEL is set to the directory containing the .git folder of a git-repo
+
       # is this a git repo
-      if [[ "o_no_vcs" != "" ]]; then
+      if [[ "$o_no_vcs" != "" ]]; then
         IS_GIT_REPO=0
+	GIT_TOPLEVEL=''
       else
-        (( IS_DIRECTORY )) && cd $base_dir || cd $(dirname $base_dir)
-        if [[ $k == 1 && $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]
-          then
+	if (( IS_DIRECTORY ));
+	  then cd $NAME     2>/dev/null || cd - >/dev/null && IS_GIT_REPO=0 #Say no if we don't have permissions there
+          else cd $NAME:a:h 2>/dev/null || cd - >/dev/null && IS_GIT_REPO=0
+	fi
+        if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
           IS_GIT_REPO=1
+	  GIT_TOPLEVEL=$(git rev-parse --show-toplevel)
+	else
+	  IS_GIT_REPO=0
         fi
         cd - >/dev/null
       fi
@@ -372,30 +381,22 @@ k () {
       if [[ "$o_no_vcs" != "" ]]; then
 	REPOMARKER=""
       else
-        # Check for git repo, first checking if the result is a directory
-        typeset DIR DOTTEDNAME
-        DOTTEDNAME=./$NAME
-        DIR=${DOTTEDNAME%/*} # Does the same as $(dirname $NAME)
-        if (( IS_GIT_REPO == 0)) || (( k <= 2 ))
-        then
-          if (( IS_DIRECTORY )) && [[ -d "$NAME/.git" ]]
-          then
-            if command git --git-dir="${NAME}/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+        # Check for git repo
+        if (( IS_GIT_REPO != 0)); then
+	  if (( IS_DIRECTORY )); then
+            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
               then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
               else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
             fi
-          fi
-        fi
-
-        if (( IS_GIT_REPO )) && (( k > 2 )) && [[ "$NAME" != '.git' ]]
-        then
-          STATUS="$(command git --git-dir=${DIR}/.git --work-tree=${DIR} status --porcelain --ignored --untracked-files=normal "${NAME##*/}")"
-          STATUS="${STATUS[1,2]}"
-            if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
-          elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
-          elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-          elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
-          else                             REPOMARKER=$'\e[38;5;082m|\e[0m';     # Good
+	  else
+            STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+            STATUS=${STATUS[1,2]}
+              if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
+            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
+            elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
+            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
+            else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
+            fi
           fi
         fi
       fi
