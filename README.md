@@ -64,9 +64,8 @@ Git 1.7.2
 [Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from zsh pure theme  
 [Rupa](https://github.com/rupa/z) for that slammin' strapline  
 
-## Contributing
-Pull requests welcome.
-
+## Contributers
+Pull requests welcome.  
 [supercrabtree](https://github.com/supercrabtree) 56  
 [chrstphrknwtn](https://github.com/chrstphrknwtn) 38  
 [zirrostig](https://github.com/zirrostig) 19  
