@@ -324,7 +324,7 @@ k () {
       fi
 
       # --- --- rwx warning
-      if [[ $PER3 == "rwx" && ! IS_SYMLINK ]]; then
+      if [[ $PER3 == "rwx" ]] && (( ! IS_SYMLINK )); then
         PERMISSIONS_OUTPUT=$'\e[30;41m'"$PERMISSIONS"$'\e[0m'
       fi
 
