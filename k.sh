@@ -298,7 +298,7 @@ k () {
       FILETYPE="${PERMISSIONS[1]}"
       if (( IS_DIRECTORY ))
         then
-        FILETYPE=${FILETYPE//d/$'\e[1;36m'd$'\e[0m'};
+        FILETYPE=${FILETYPE//d/$'\e[0;36m'd$'\e[0m'};
       elif (( IS_SYMLINK ))
         then
         FILETYPE=${FILETYPE//l/$'\e[0;35m'l$'\e[0m'};
@@ -335,8 +335,8 @@ k () {
       # --------------------------------------------------------------------------
       # Colour Owner and Group
       # --------------------------------------------------------------------------
-      OWNER=$'\e[38;5;241m'"$OWNER"$'\e[0m'
-      GROUP=$'\e[38;5;241m'"$GROUP"$'\e[0m'
+      OWNER=$'\e[0;30m'"$OWNER"$'\e[0m'
+      GROUP=$'\e[0;30m'"$GROUP"$'\e[0m'
 
       # --------------------------------------------------------------------------
       # Colour file weights
@@ -385,17 +385,17 @@ k () {
         if (( IS_GIT_REPO != 0)); then
 	  if (( IS_DIRECTORY )); then
             if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-              then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
+              then REPOMARKER=$'\e[0;32m|\e[0m' # Show a green vertical bar for dirty
               else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
             fi
 	  else
             STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
             STATUS=${STATUS[1,2]}
               if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
-            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
-            elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
-            else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
+            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[0;33m|\e[0m'; # Untracked
+            elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[0;30m|\e[0m'; # Ignored
+            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[0;34m|\e[0m'; # Added
+            else                             REPOMARKER=$'\e[0;32m|\e[0m'; # Good
             fi
           fi
         fi
@@ -410,7 +410,7 @@ k () {
 
       if (( IS_DIRECTORY ))
       then
-        NAME=$'\e[38;5;32m'"$NAME"$'\e[0m'
+        NAME=$'\e[0;36m'"$NAME"$'\e[0m'
       elif (( IS_SYMLINK ))
       then
         NAME=$'\e[0;35m'"$NAME"$'\e[0m'
