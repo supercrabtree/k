@@ -1,4 +1,5 @@
 zmodload zsh/datetime
+zmodload zsh/mathfunc
 zmodload -F zsh/stat b:zstat
 
 k () {
@@ -11,7 +12,7 @@ k () {
   setopt local_options null_glob warn_create_global typeset_silent
 
   # Process options and get files/directories
-  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help
+  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help o_absolute_colors
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
@@ -20,6 +21,7 @@ k () {
              -si=o_si \
              n=o_no_directory -no-directory=o_no_directory \
              -no-vcs=o_no_vcs \
+             G=o_absolute_colors -static-colors=o_absolute_colors \
              -help=o_help
 
   # Print Help if bad usage, or they asked for it
@@ -34,6 +36,7 @@ k () {
     print -u2 "\t-h      --human         show filesizes in human-readable format"
     print -u2 "\t        --si            with -h, use powers of 1000 not 1024"
     print -u2 "\t        --no-vcs        do not get VCS status (much faster)"
+    print -u2 "\t-G      --static-colors do not adjust color scale automatically"
     print -u2 "\t        --help          show this help"
     return 1
   fi
@@ -90,12 +93,12 @@ k () {
     # ----------------------------------------------------------------------------
 
     typeset -a MAX_LEN A RESULTS STAT_RESULTS
-    typeset TOTAL_BLOCKS
+    typeset TOTAL_BLOCKS MIN_AGE MIN_SIZE
 
     # Get now
     typeset K_EPOCH="${EPOCHSECONDS:?}"
 
-    typeset -i TOTAL_BLOCKS=0
+    typeset -i TOTAL_BLOCKS=0 MAX_AGE=0 MAX_SIZE=0
 
     MAX_LEN=(0 0 0 0 0 0)
 
@@ -213,9 +216,51 @@ k () {
         if [[ ${#sv[size]} -gt $MAX_LEN[5] ]]; then MAX_LEN[5]=${#sv[size]}; fi
       fi
 
+      if [[ "$o_absolute_colors" == "" ]]; then
+        # Also get the min/max age and size
+        typeset -i AGE=$(( $K_EPOCH - ${${(s:^:)sv[mtime]}[1]} ))
+        if [[ $MIN_AGE == "" || $AGE -lt $MIN_AGE ]]; then MIN_AGE=$AGE; fi
+        if [[ $AGE -gt $MAX_AGE ]]; then MAX_AGE=$AGE; fi
+        if [[ $MIN_SIZE == "" || ${sv[size]} -lt $MIN_SIZE ]]; then MIN_SIZE=${sv[size]}; fi
+        if [[ ${sv[size]} -gt $MAX_SIZE ]]; then MAX_SIZE=${sv[size]}; fi
+      fi
+
       TOTAL_BLOCKS+=$sv[blocks]
     done
 
+    if [[ "$o_absolute_colors" == "" ]]; then
+      # Calculate limits for colors; use an exponential scale
+      typeset X=$(( ($MAX_SIZE - $MIN_SIZE) ** (1.0 / 10) ))
+      SIZELIMITS_TO_COLOR=(
+        $(( $MIN_SIZE + int($X ** 0) ))  46
+        $(( $MIN_SIZE + int($X ** 1) ))  82
+        $(( $MIN_SIZE + int($X ** 2) ))  118
+        $(( $MIN_SIZE + int($X ** 3) ))  154
+        $(( $MIN_SIZE + int($X ** 4) ))  190
+        $(( $MIN_SIZE + int($X ** 5) ))  226
+        $(( $MIN_SIZE + int($X ** 6) ))  220
+        $(( $MIN_SIZE + int($X ** 7) ))  214
+        $(( $MIN_SIZE + int($X ** 8) ))  208
+        $(( $MIN_SIZE + int($X ** 9) ))  202
+        $(( $MIN_SIZE + int($X ** 10) )) 196
+        )
+
+      # a slighter exponential range for ages
+      typeset X=$(( ($MAX_AGE - $MIN_AGE) ** (1.0 / 4.5) ))
+      FILEAGES_TO_COLOR=(
+        0 196 # future
+        $(( $MIN_AGE + int($X ** 0.5) ))  255
+        $(( $MIN_AGE + int($X ** 1.0) ))  252
+        $(( $MIN_AGE + int($X ** 1.5) ))  250
+        $(( $MIN_AGE + int($X ** 2.0) ))  247
+        $(( $MIN_AGE + int($X ** 2.5) ))  244
+        $(( $MIN_AGE + int($X ** 3.0) ))  242
+        $(( $MIN_AGE + int($X ** 3.5) ))  240
+        $(( $MIN_AGE + int($X ** 4.0) ))  238
+        $(( $MIN_AGE + int($X ** 4.5) ))  236
+        )
+    fi
+    
     # Print total block before listing
     echo "total $TOTAL_BLOCKS"
 
