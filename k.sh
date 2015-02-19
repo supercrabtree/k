@@ -230,6 +230,7 @@ k () {
     typeset -i IS_DIRECTORY IS_SYMLINK IS_EXECUTABLE
     typeset -i COLOR
     typeset UNPUSHED
+    typeset BRANCH
 
     k=1
     for statvar in "${STATS_PARAMS_LIST[@]}"
@@ -379,6 +380,8 @@ k () {
       # --------------------------------------------------------------------------
       # Colour the repomarker
       # --------------------------------------------------------------------------
+      UNPUSHED=$'\e[38;5;32m'"${(r:3:: :)}"$'\e[0m'
+
       if [[ "$o_no_vcs" != "" ]]; then
 	REPOMARKER=""
       else
@@ -393,10 +396,10 @@ k () {
 
             # Compute unpushed commits
             # Get branch
-            branch=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-parse --abbrev-ref HEAD 2>/dev/null)
-            if [ $? -ne 0 ] || [ -z "$branch" ];
+            BRANCH=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if [ $? -ne 0 ] || [ -z "$BRANCH" ];
               then UNPUSHED='0'
-              else UNPUSHED=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-list --count HEAD origin/$branch...HEAD 2>/dev/null)
+              else UNPUSHED=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-list --count HEAD origin/$BRANCH...HEAD 2>/dev/null)
             fi
 
             if [ -z "$UNPUSHED" ] || [ "$UNPUSHED" -eq "0" ]; then
