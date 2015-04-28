@@ -229,6 +229,8 @@ k () {
     typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
     typeset -i IS_DIRECTORY IS_SYMLINK IS_EXECUTABLE
     typeset -i COLOR
+    typeset UNPUSHED
+    typeset BRANCH
 
     k=1
     for statvar in "${STATS_PARAMS_LIST[@]}"
@@ -378,16 +380,33 @@ k () {
       # --------------------------------------------------------------------------
       # Colour the repomarker
       # --------------------------------------------------------------------------
+      UNPUSHED=$'\e[38;5;32m'"${(r:3:: :)}"$'\e[0m'
+
       if [[ "$o_no_vcs" != "" ]]; then
 	REPOMARKER=""
       else
         # Check for git repo
         if (( IS_GIT_REPO != 0)); then
 	  if (( IS_DIRECTORY )); then
+            # Bar color for dirty/clean directory
             if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
               then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
               else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
             fi
+
+            # Compute unpushed commits
+            # Get branch
+            BRANCH=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if [ $? -ne 0 ] || [ -z "$BRANCH" ];
+              then UNPUSHED='0'
+              else UNPUSHED=$(git --git-dir="$GIT_TOPLEVEL/.git" rev-list --count HEAD origin/$BRANCH...HEAD 2>/dev/null)
+            fi
+
+            if [ -z "$UNPUSHED" ] || [ "$UNPUSHED" -eq "0" ]; then
+              UNPUSHED=''
+            fi
+
+            UNPUSHED=$'\e[38;5;32m'"${(r:3:: :)UNPUSHED}"$'\e[0m'
 	  else
             STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
             STATUS=${STATUS[1,2]}
@@ -424,7 +443,7 @@ k () {
       # --------------------------------------------------------------------------
       # Display final result
       # --------------------------------------------------------------------------
-      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
+      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $UNPUSHED $NAME $SYMLINK_TARGET"
 
       k=$((k+1)) # Bump loop index
     done
