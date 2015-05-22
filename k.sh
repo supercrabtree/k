@@ -408,13 +408,8 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-      if (( IS_DIRECTORY ))
-      then
-        NAME=$'\e[38;5;32m'"$NAME"$'\e[0m'
-      elif (( IS_SYMLINK ))
-      then
-        NAME=$'\e[0;35m'"$NAME"$'\e[0m'
-      fi
+      # Call ls so it's possible to reuse $LS_COLORS (with GNU coreutils) or $LSCOLORS (with BSD)
+      NAME=$(command ls --color -d -1 $NAME 2>/dev/null || command ls -G -d -1 $NAME 2>/dev/null)
 
       # --------------------------------------------------------------------------
       # Format symlink target
