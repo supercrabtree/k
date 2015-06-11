@@ -419,7 +419,7 @@ k () {
       # --------------------------------------------------------------------------
       # Format symlink target
       # --------------------------------------------------------------------------
-      if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> ${(q-)SYMLINK_TARGET//$'\e'/\\e}"; fi
+      if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> ${SYMLINK_TARGET//$'\e'/\\e}"; fi
 
       # --------------------------------------------------------------------------
       # Display final result
