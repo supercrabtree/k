@@ -61,6 +61,12 @@ k () {
     fi
   }
 
+  # Set if we're in a repo or not
+  typeset -i INSIDE_WORK_TREE=0
+  if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
+    INSIDE_WORK_TREE=1
+  fi
+
   # Setup array of directories to print
   typeset -a base_dirs
 
@@ -380,24 +386,39 @@ k () {
       # --------------------------------------------------------------------------
       if [[ "$o_no_vcs" != "" ]]; then
         REPOMARKER=""
-      else
-        # Check for git repo
-        if (( IS_GIT_REPO != 0)); then
-          if (( IS_DIRECTORY )); then
-            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-              then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for dirty
-              else REPOMARKER=$'\e[0;31m|\e[0m' # Show a red vertical bar if clean
+      elif (( IS_GIT_REPO != 0)); then
+        # If we're not in a repo, still check each directory if it's a repo, and
+        # then mark appropriately
+        if (( INSIDE_WORK_TREE == 0 )); then
+          # if (( IS_GIT_REPO != 0)); then
+            if (( IS_DIRECTORY )); then
+              if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+                then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
+                else REPOMARKER=$'\e[0;31m+\e[0m' # Show a red vertical bar if dirty
+              fi
             fi
-          else
-            STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+          # fi
+        else
+          # Check if file or directory is in a git repo
+          # if (( IS_GIT_REPO != 0)); then
+            if (( IS_DIRECTORY )); then
+              # If the directory is ignored, skip it
+              if command git check-ignore --quiet ${NAME} 2>/dev/null
+                then STATUS='!!'
+                else STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+              fi
+            else
+              STATUS=$(git status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+            fi
             STATUS=${STATUS[1,2]}
-              if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m|\e[0m';     # Modified
-            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m|\e[0m'; # Untracked
+              if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
+            elif [[ $STATUS == 'M ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Tracked & Dirty & Added
+            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m+\e[0m'; # Untracked
             elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;093m|\e[0m'; # Added
+            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Added
             else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
             fi
-          fi
+          # fi
         fi
       fi
 
