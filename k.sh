@@ -408,7 +408,8 @@ k () {
                 else STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
               fi
             else
-              STATUS=$(git status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+              # STATUS=$(git status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+              STATUS=$(git status --porcelain --ignored --untracked-files=normal $NAME)
             fi
             STATUS=${STATUS[1,2]}
               if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
