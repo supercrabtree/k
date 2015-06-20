@@ -274,7 +274,7 @@ k () {
         fi
         if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
           IS_GIT_REPO=1
-          GIT_TOPLEVEL=$(git rev-parse --show-toplevel)
+          GIT_TOPLEVEL=$(command git rev-parse --show-toplevel)
         else
           IS_GIT_REPO=0
         fi
@@ -401,10 +401,10 @@ k () {
             # If the directory is ignored, skip it
             if command git check-ignore --quiet ${NAME} 2>/dev/null
               then STATUS='!!'
-              else STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+              else STATUS=$(command git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
             fi
           else
-            STATUS=$(git status --porcelain --ignored --untracked-files=normal $NAME)
+            STATUS=$(command git status --porcelain --ignored --untracked-files=normal $NAME)
           fi
           STATUS=${STATUS[1,2]}
             if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
