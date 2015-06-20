@@ -1,109 +1,112 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>K by supercrabtree</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>K</h1>
-        <p>k is the new l, yo</p>
-
-        <p class="view"><a href="https://github.com/supercrabtree/k">View the Project on GitHub <small>supercrabtree/k</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/supercrabtree/k/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/supercrabtree/k/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/supercrabtree/k">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png" alt="k"></p>
-
-<blockquote>
-<p>k is the new l, yo</p>
-</blockquote>
-
-<h2>
-<a name="directory-listings-for-zsh-with-git-features" class="anchor" href="#directory-listings-for-zsh-with-git-features"><span class="octicon octicon-link"></span></a>Directory listings for zsh with git features.</h2>
-
-<p>k is a zsh script to make directory listings more readable, adding a bit of color and some git information.</p>
-
-<h3>
-<a name="git-status-on-entire-repos" class="anchor" href="#git-status-on-entire-repos"><span class="octicon octicon-link"></span></a>Git status on entire repos</h3>
-
-<p>Red for dirty, green for committed.</p>
-
-<p>Turns this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-ls.jpg" alt="repos-ls"></p>
-
-<p>Into this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg" alt="repos-k"></p>
-
-<h3>
-<a name="git-status-on-files-within-a-working-tree" class="anchor" href="#git-status-on-files-within-a-working-tree"><span class="octicon octicon-link"></span></a>Git status on files within a working tree</h3>
-
-<p>Red for dirty, green for committed, orange for untracked, grey for ingored.</p>
-
-<p>Turns this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-ls.jpg" alt="status-ls"></p>
-
-<p>Into this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-k.jpg" alt="status-k"></p>
-
-<h3>
-<a name="file-weight-colours" class="anchor" href="#file-weight-colours"><span class="octicon octicon-link"></span></a>File weight colours</h3>
-
-<p>Files sizes are graded from green for small (&lt; 1k), to red for huge (&gt; 1mb).</p>
-
-<p>Turns this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-ls.jpg" alt="status-ls"></p>
-
-<p>Into this:<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-k.jpg" alt="status-k"></p>
-
-<h3>
-<a name="rotting-dates" class="anchor" href="#rotting-dates"><span class="octicon octicon-link"></span></a>Rotting dates</h3>
-
-<p>Dates fade with age.<br><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg" alt="repos-k"></p>
-
-<h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
-
-<p>Put <code>k.sh</code> somewhere, and source it in your <code>.zshrc</code>.</p>
-
-<pre lang="shell"><code>source ~/path-to/k/k.sh
-</code></pre>
-
-<p>hit k</p>
-
-<pre lang="shell"><code>k
-</code></pre>
-
-<p>profit</p>
-
-<h2>
-<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h2>
-
-<p><a href="http://www.falstad.com/">Paul Falstad</a> for zsh<br><a href="https://github.com/robbyrussell">Robby Russell</a> for making the shell fun with oh my zsh<br><a href="https://github.com/sindresorhus">Sindre Sorhus</a> for fast git commands from zsh pure theme<br><a href="https://github.com/rupa/z">Rupa</a> for that slammin' strapline  </p>
-
-<h2>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
-
-<p>Pull requests welcome.</p>
-
-<p>Copyright © 2014 George Crabtree &amp; Christopher Newton. MIT License</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/supercrabtree">supercrabtree</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>k is the new l, yo | Directory listings with Git status for zsh</title>
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,200italic,300italic,400italic,600italic' rel='stylesheet' type='text/css'>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      font-size: 16px;
+      font-family: 'Source Sans Pro', Helvetica, sans-serif;
+      font-weight: 300;
+      line-height: 1.4;
+      color: #e1e1e1;
+      background-color: #222222;
+/*      background-image: url('bg.gif');
+      background-repeat: repeat;
+      background-size: 300px 300px;
+*/    }
+    h1 {
+      margin: 1em 0 0.2em 0;
+      font-weight: 200;
+    }
+    p {
+      padding: 0 20px;
+      margin: 0 0 0 0;
+    }
+    small {
+      font-size: 0.8em;
+      color: #666;
+    }
+    .container {
+      max-width: 600px;
+      padding: 20px;
+      margin: 0 auto;
+    }
+    header {
+      padding-top: 80px;
+      margin: 0 0 2em 0;
+      text-align: center;
+    }
+    .download {
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      min-width: 160px;
+      padding: 4px 20px 5px 20px;
+      margin: 0 6px;
+      font-size: 0.9em;
+      font-weight: 400;
+      text-decoration: none;
+      color: #e1e1e1;
+      background-color: transparent;
+      border: 1px solid #999999;
+      border-radius: 4px;
+      transition: all 0.2s ease-out;
+    }
+    .btn:hover {
+      color: #222222;
+      background-color: #e1e1e1;
+      border-color: #e1e1e1;
+    }
+    .terminal {
+      width: 100%;
+      padding: 6px 0;
+      margin-top: 3em;
+      background-color: black;
+      overflow: hidden;
+      border-radius: 6px;
+    }
+    video {
+      max-width: 100%;
+    }
+    .notice {
+      padding: 0.8em 0 2em 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img src="k-logo.png">
+      <h1>k is the new l, yo</h1>
+      <p><strong>k</strong> is a z-shell script to make directory listings more readable, adding a bit of color and some git status information on files and directories.</p>
+    </header>
+    <section class="download">
+      <!-- <a class="btn" href="#">Download</a> -->
+      <a class="btn" href="//github.com/supercrabtree/k">View on Github</a>
+    </section>
+    <section class="terminal">
+      <video poster="k-demo-hr-poster.jpg" autoplay loop>
+        <source src="k-demo-hr.mp4" type="video/mp4">
+        <source src="k-demo-hr.webm" type="video/webm">
+        <source src="k-demo-hr.ogv" type="video/ogv">
+      </video>
+    </section>
+    <section class="notice">
+      <small>Copyright &copy; 2015 George Crabtree &amp; Christopher Newton · MIT License</small>
+    </section>
+  </div>
+</body>
 </html>
