@@ -1,41 +1,28 @@
-![k](https://raw.githubusercontent.com/supercrabtree/k/master/k-logo.png)
+![k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png)
 
 > k is the new l, yo
 
-## Directory listings for zsh with git features. 
-k is a zsh script to make directory listings more readable, adding a bit of color and some git information.
+## Directory listings for zsh with git features
+
+**k** is a zsh script / plugin to make directory listings more readable, adding a bit of color and some git status information on files and directories.
 
 ### Git status on entire repos
-Red for dirty, green for committed.
+![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repo-dirs.jpg)
 
-Turns this:  
-![repos-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-ls.jpg)
-
-Into this:  
-![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
 
 ### Git status on files within a working tree
-Red for dirty, green for committed, orange for untracked, grey for ingored.
-
-Turns this:  
-![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-ls.jpg)
-
-Into this:  
-![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/status-k.jpg)
+![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/inside-work-tree.jpg)
 
 ### File weight colours
 Files sizes are graded from green for small (< 1k), to red for huge (> 1mb).
 
-Turns this:  
-![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-ls.jpg)
+![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/file-size-colors.jpg)
 
-Into this:  
-![status-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/size-k.jpg)
 
 ### Rotting dates
-
 Dates fade with age.  
-![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repos-k.jpg)
+
+![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/dates.jpg)
 
 
 ## Usage
@@ -50,8 +37,6 @@ hit k
 ```shell
 k
 ```
-
-profit
 
 ## Minimum Requirements
 zsh 4.3.11  
