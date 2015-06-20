@@ -390,36 +390,30 @@ k () {
         # If we're not in a repo, still check each directory if it's a repo, and
         # then mark appropriately
         if (( INSIDE_WORK_TREE == 0 )); then
-          # if (( IS_GIT_REPO != 0)); then
-            if (( IS_DIRECTORY )); then
-              if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-                then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
-                else REPOMARKER=$'\e[0;31m+\e[0m' # Show a red vertical bar if dirty
-              fi
+          if (( IS_DIRECTORY )); then
+            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+              then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
+              else REPOMARKER=$'\e[0;31m+\e[0m' # Show a red vertical bar if dirty
             fi
-          # fi
+          fi
         else
-          # Check if file or directory is in a git repo
-          # if (( IS_GIT_REPO != 0)); then
-            if (( IS_DIRECTORY )); then
-              # If the directory is ignored, skip it
-              if command git check-ignore --quiet ${NAME} 2>/dev/null
-                then STATUS='!!'
-                else STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
-              fi
-            else
-              # STATUS=$(git status --porcelain --ignored --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
-              STATUS=$(git status --porcelain --ignored --untracked-files=normal $NAME)
+          if (( IS_DIRECTORY )); then
+            # If the directory is ignored, skip it
+            if command git check-ignore --quiet ${NAME} 2>/dev/null
+              then STATUS='!!'
+              else STATUS=$(git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
             fi
-            STATUS=${STATUS[1,2]}
-              if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
-            elif [[ $STATUS == 'M ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Tracked & Dirty & Added
-            elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m+\e[0m'; # Untracked
-            elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-            elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Added
-            else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
-            fi
-          # fi
+          else
+            STATUS=$(git status --porcelain --ignored --untracked-files=normal $NAME)
+          fi
+          STATUS=${STATUS[1,2]}
+            if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
+          elif [[ $STATUS == 'M ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Tracked & Dirty & Added
+          elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m+\e[0m'; # Untracked
+          elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
+          elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Added
+          else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
+          fi
         fi
       fi
 
