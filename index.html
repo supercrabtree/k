@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>k is the new l, yo | Directory listings with Git status for zsh</title>
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,200italic,300italic,400italic,600italic' rel='stylesheet' type='text/css'>
   <style>
@@ -21,10 +22,8 @@
       line-height: 1.4;
       color: #e1e1e1;
       background-color: #222222;
-/*      background-image: url('bg.gif');
-      background-repeat: repeat;
-      background-size: 300px 300px;
-*/    }
+      -webkit-text-size-adjust: none;
+    }
     h1 {
       margin: 1em 0 0.2em 0;
       font-weight: 200;
@@ -43,9 +42,14 @@
       margin: 0 auto;
     }
     header {
-      padding-top: 80px;
+      padding-top: 3em;
       margin: 0 0 2em 0;
       text-align: center;
+    }
+    @media screen and (max-width: 480px) {
+      header {
+        padding-top: 2em;
+      }
     }
     .download {
       text-align: center;
