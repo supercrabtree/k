@@ -9,6 +9,7 @@
     * {
       box-sizing: border-box;
     }
+    img { -ms-interpolation-mode: bicubic; }
     html, body {
       width: 100%;
       height: 100%;
@@ -50,6 +51,10 @@
       header {
         padding-top: 2em;
       }
+    }
+    .logo {
+      width: 112px;
+      height: 112px;
     }
     .download {
       text-align: center;
@@ -93,7 +98,7 @@
 <body>
   <div class="container">
     <header>
-      <img src="k-logo.png">
+      <img class="logo" src="k-logo-hr.png">
       <h1>k is the new l, yo</h1>
       <p><strong>k</strong> is a z-shell script to make directory listings more readable, adding a bit of color and some git status information on files and directories.</p>
     </header>
