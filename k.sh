@@ -391,20 +391,21 @@ k () {
         # then mark appropriately
         if (( INSIDE_WORK_TREE == 0 )); then
           if (( IS_DIRECTORY )); then
-            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --stat --quiet --ignore-submodules HEAD &>/dev/null # if dirty
               then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
               else REPOMARKER=$'\e[0;31m+\e[0m' # Show a red vertical bar if dirty
             fi
           fi
         else
           if (( IS_DIRECTORY )); then
-            # If the directory is ignored, skip it
-            if command git check-ignore --quiet ${NAME} 2>/dev/null
-              then STATUS='!!'
-              else STATUS=$(command git --git-dir=$GIT_TOPLEVEL/.git --work-tree=$GIT_TOPLEVEL status --porcelain --untracked-files=normal ${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+            # If the directory isn't ignored or clean, we'll just say it's dirty
+            if command git check-ignore --quiet ${NAME} 2>/dev/null; then STATUS='!!'
+            elif command git diff --stat --quiet --ignore-submodules ${NAME} 2> /dev/null; then STATUS='';
+            else STATUS=' M'
             fi
           else
-            STATUS=$(command git status --porcelain --ignored --untracked-files=normal $NAME)
+            # File
+            STATUS=$(command git status --porcelain --ignored --untracked-files=normal $GIT_TOPLEVEL/${${${NAME:a}##$GIT_TOPLEVEL}#*/})
           fi
           STATUS=${STATUS[1,2]}
             if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
