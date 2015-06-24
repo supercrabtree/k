@@ -1,4 +1,4 @@
-![k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png)
+<a href="http://k.rimraf.com"><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png"></a>
 
 > k is the new l, yo
 
@@ -57,7 +57,7 @@ Git 1.7.2
 ## Contributers
 Pull requests welcome.  
 [supercrabtree](https://github.com/supercrabtree) 56  
-[chrstphrknwtn](https://github.com/chrstphrknwtn) 41  
+[chrstphrknwtn](https://github.com/chrstphrknwtn) 43  
 [zirrostig](https://github.com/zirrostig) 19  
 [lejeunerenard](https://github.com/lejeunerenard) 2  
 [george-b](https://github.com/george-b) 1  
@@ -68,7 +68,7 @@ Pull requests welcome.
 [srijanshetty](https://github.com/srijanshetty) 1  
 [mattboll](https://github.com/mattboll) 1  
 
-It Would really like to make this posix compliant so that it can be used with bash and other shells. But don't really know anything about shell scripting, so if you think you could help that would be cooool :)
+We'd like to make this POSIX compliant so that it can be used with bash and other shells. But don't really know anything about shell scripting, so if you think you could help that would be coooool :)
 
 ## Thanks
 [Paul Falstad](http://www.falstad.com/) for zsh  
@@ -76,4 +76,4 @@ It Would really like to make this posix compliant so that it can be used with ba
 [Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from zsh pure theme  
 [Rupa](https://github.com/rupa/z) for that slammin' strapline  
 
-Copyright © 2015 George Crabtree & Christopher Newton. MIT License
+Copyright © 2015 George Crabtree & Christopher Newton. MIT License.
