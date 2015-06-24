@@ -44,20 +44,36 @@ k () {
     return 1
   fi
 
-  # Check for the command numfmt, warn user if not available
-  if [[ "$o_human" != "" && $+commands[numfmt] == 0 ]]; then
-    print -u2 "'numfmt' command not found, human readable output will not work."
-    print -u2 "\tFalling back to normal file size output"
-    # Set o_human to off
-    o_human=""
+  # Check which numfmt available (if any), warn user if not available
+  typeset -i numfmt_available=0
+  typeset -i gnumfmt_available=0
+  if [[ "$o_human" != "" ]]; then
+    if [[ $+commands[numfmt] == 1 ]]; then
+      numfmt_available=1
+    elif [[ $+commands[gnumfmt] == 1 ]]; then
+      gnumfmt_available=1
+    else
+      print -u2 "'numfmt' or 'gnumfmt' command not found, human readable output will not work."
+      print -u2 "\tFalling back to normal file size output"
+      # Set o_human to off
+      o_human=""
+    fi
   fi
 
   # Create numfmt local function
   numfmt_local () {
     if [[ "$o_si" != "" ]]; then
-      numfmt --to=si $1
+      if (( $numfmt_available )); then
+        numfmt --to=si $1
+      elif (( $gnumfmt_available )); then
+        gnumfmt --to=si $1
+      fi
     else
-      numfmt --to=iec $1
+      if (( $numfmt_available )); then
+        numfmt --to=iec $1
+      elif (( $gnumfmt_available )); then
+        gnumfmt --to=iec $1
+      fi
     fi
   }
 
