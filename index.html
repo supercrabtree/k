@@ -21,6 +21,7 @@
       font-family: 'Source Sans Pro', Helvetica, sans-serif;
       font-weight: 300;
       line-height: 1.4;
+      text-align: center;
       color: #e1e1e1;
       background-color: #222222;
       -webkit-text-size-adjust: none;
@@ -31,11 +32,17 @@
     }
     p {
       padding: 0 20px;
-      margin: 0 0 0 0;
+      margin: 0 0 1em 0;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
     small {
       font-size: 0.8em;
-      color: #666;
     }
     .container {
       max-width: 600px;
@@ -45,7 +52,6 @@
     header {
       padding-top: 3em;
       margin: 0 0 2em 0;
-      text-align: center;
     }
     @media screen and (max-width: 480px) {
       header {
@@ -56,9 +62,6 @@
       width: 112px;
       height: 112px;
     }
-    .download {
-      text-align: center;
-    }
     .btn {
       display: inline-block;
       min-width: 160px;
@@ -66,7 +69,6 @@
       margin: 0 6px;
       font-size: 0.9em;
       font-weight: 400;
-      text-decoration: none;
       color: #e1e1e1;
       background-color: transparent;
       border: 1px solid #999999;
@@ -75,13 +77,22 @@
     }
     .btn:hover {
       color: #222222;
+      text-decoration: none;
       background-color: #e1e1e1;
       border-color: #e1e1e1;
+    }
+    .repo-stats {
+      margin: 0.4em 0 0 0;
+    }
+    .repo-stats .icon {
+      display: inline-block;
+      margin: 0 0.2em 0 0.8em;
+      font-size: 0.9em;
     }
     .terminal {
       width: 100%;
       padding: 6px 0;
-      margin-top: 3em;
+      margin-top: 2em;
       background-color: black;
       overflow: hidden;
       border-radius: 6px;
@@ -91,7 +102,10 @@
     }
     .notice {
       padding: 0.8em 0 2em 0;
-      text-align: center;
+    }
+    .notice small {
+      display: block;
+      color: #666;
     }
   </style>
 </head>
@@ -105,6 +119,15 @@
     <section class="download">
       <a class="btn" href="https://github.com/rimraf/k">View on Github</a>
     </section>
+    <section class="repo-stats">
+      <small>
+        <span class="version">
+          <a href="https://github.com/rimraf/k/releases">v0.0.4</a>
+        </span>
+        <span class="icon">★</span>
+        <span id="stargazers-count"></span>
+      </small>
+    </section>
     <section class="terminal">
       <video poster="k-demo-hr-poster.jpg" autoplay loop>
         <source src="k-demo-hr.mp4" type="video/mp4">
@@ -112,9 +135,26 @@
         <source src="k-demo-hr.ogv" type="video/ogv">
       </video>
     </section>
-    <section class="notice">
+    <footer class="notice">
       <small>Copyright &copy; 2015 George Crabtree &amp; Christopher Newton · MIT License</small>
-    </section>
+      <small>ZSH prompt above uses <a href="https://github.com/sindresorhus/pure">Sindre Sorhus' pure</a>.</small>
+    </footer>
   </div>
+  <script>
+    function load(url, cb) {
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = xhrReady;
+      function xhrReady() {
+        if(xhr.readyState < 4) return;
+        if(xhr.status !== 200) return;
+        if(xhr.readyState === 4) cb(xhr);
+      }
+      xhr.open('GET', url, true);
+      xhr.send('');
+    }
+    load('https://api.github.com/repos/rimraf/k', function(xhr) {
+      document.getElementById('stargazers-count').innerHTML = JSON.parse(xhr.responseText).stargazers_count;
+    });
+  </script>
 </body>
 </html>
