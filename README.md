@@ -1,4 +1,4 @@
-<a href="http://k.rimraf.com"><img src="https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png"></a>
+[![k.rimraf.com](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png)](http://k.rimraf.com)
 
 > k is the new l, yo
 
@@ -7,22 +7,29 @@
 **k** is a zsh script / plugin to make directory listings more readable, adding a bit of color and some git status information on files and directories.
 
 ### Git status on entire repos
-![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repo-dirs.jpg)
+![Repository git status](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/repo-dirs.jpg)
 
 
 ### Git status on files within a working tree
-![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/inside-work-tree.jpg)
+![Repository work tree git status](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/inside-work-tree.jpg)
 
 ### File weight colours
 Files sizes are graded from green for small (< 1k), to red for huge (> 1mb).
 
-![status-ls](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/file-size-colors.jpg)
+**Human readable files sizes**  
+Human readable files sizes can be shown by using the `-h` flag, which requires the `numfmt` command to be available. OS X / Darwin does not have a `numfmt` command by default, so GNU coreutils needs to be installed, which provides `gnumfmt` that `k` will also use if available. GNU coreutils can be installed on OS X with [homebrew](http://brew.sh):
+
+```
+brew install coreutils
+```
+
+![File weight colours](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/file-size-colors.jpg)
 
 
 ### Rotting dates
 Dates fade with age.  
 
-![repos-k](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/dates.jpg)
+![Rotting dates](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/dates.jpg)
 
 
 ## Installation
@@ -57,7 +64,7 @@ Git 1.7.2
 ## Contributers
 Pull requests welcome.  
 [supercrabtree](https://github.com/supercrabtree) 56  
-[chrstphrknwtn](https://github.com/chrstphrknwtn) 43  
+[chrstphrknwtn](https://github.com/chrstphrknwtn) 44  
 [zirrostig](https://github.com/zirrostig) 19  
 [lejeunerenard](https://github.com/lejeunerenard) 2  
 [george-b](https://github.com/george-b) 1  
