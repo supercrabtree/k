@@ -43,6 +43,15 @@ antigen bundle rimraf/k
 antigen apply
 ```
 
+### Using [zgen](https://github.com/tarjoilija/zgen)
+
+Include the load command in your `.zshrc`
+
+```shell
+zgen load rimraf/k
+zgen save
+```
+
 ### Manually
 Put `k.sh` somewhere, and source it in your `.zshrc`.
 
