@@ -34,6 +34,21 @@ Dates fade with age.
 
 ## Installation
 
+### Manual script download
+Put `k.sh` somewhere, and source it in your `~/.zshrc`.
+
+```shell
+source ~/path-to/k/k.sh
+```
+
+### Custom plugin clone
+Clone it:
+```shell
+git clone https://github.com/rimraf/k ~/.oh-my-zsh/custom/plugins/k
+```
+
+Then add `plugins+=(k)` to your `~/.zshrc`
+
 ### Using [Antigen](https://github.com/zsh-users/antigen)
 
 Include the bundle in your `.zshrc`
@@ -41,13 +56,6 @@ Include the bundle in your `.zshrc`
 ```shell
 antigen bundle rimraf/k
 antigen apply
-```
-
-### Manually
-Put `k.sh` somewhere, and source it in your `.zshrc`.
-
-```shell
-source ~/path-to/k/k.sh
 ```
 
 ## Usage
