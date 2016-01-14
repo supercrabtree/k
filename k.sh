@@ -285,8 +285,8 @@ k () {
         GIT_TOPLEVEL=''
       else
         if (( IS_DIRECTORY ));
-          then cd -q $NAME     2>/dev/null || cd -q - >/dev/null && IS_GIT_REPO=0 #Say no if we don't have permissions there
-          else cd -q $NAME:a:h 2>/dev/null || cd -q - >/dev/null && IS_GIT_REPO=0
+          then command cd -q $NAME     2>/dev/null || command cd -q - >/dev/null && IS_GIT_REPO=0 #Say no if we don't have permissions there
+          else command cd -q $NAME:a:h 2>/dev/null || command cd -q - >/dev/null && IS_GIT_REPO=0
         fi
         if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
           IS_GIT_REPO=1
@@ -294,7 +294,7 @@ k () {
         else
           IS_GIT_REPO=0
         fi
-        cd -q - >/dev/null
+        command cd -q - >/dev/null
       fi
 
       # Get human readable output if necessary
