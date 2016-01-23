@@ -92,6 +92,26 @@ k () {
     base_dirs=($@)
   fi
 
+  # Colors
+  # ----------------------------------------------------------------------------
+  # default colors
+  K_COLOR_DI="0;34" # di:directory
+  K_COLOR_LN="0;35" # ln:symlink
+  K_COLOR_EX="0;31" # ex:executable
+
+  # read colors if osx and $LSCOLORS is defined
+  if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
+    # Translate OSX/BSD's LSCOLORS so we can use the same here
+    _k_bsd_to_ansi K_COLOR_DI $LSCOLORS[1] $LSCOLORS[2]
+    _k_bsd_to_ansi K_COLOR_LN $LSCOLORS[3] $LSCOLORS[4]
+    _k_bsd_to_ansi K_COLOR_EX $LSCOLORS[9] $LSCOLORS[10]
+  fi
+
+  # read colors if linux and $LS_COLORS is defined
+  # if [[ $(uname) == 'Linux' && -n $LS_COLORS ]]; then
+
+  # fi
+
   # ----------------------------------------------------------------------------
   # Loop over passed directories and files to display
   # ----------------------------------------------------------------------------
@@ -443,10 +463,10 @@ k () {
 
       if (( IS_DIRECTORY ))
       then
-        NAME=$'\e[38;5;32m'"$NAME"$'\e[0m'
+        NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m'
       elif (( IS_SYMLINK ))
       then
-        NAME=$'\e[0;35m'"$NAME"$'\e[0m'
+        NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m'
       fi
 
       # --------------------------------------------------------------------------
@@ -462,6 +482,33 @@ k () {
       k=$((k+1)) # Bump loop index
     done
   done
+}
+
+_k_bsd_to_ansi() {
+  local foreground=$2 background=$3 foreground_ansi background_ansi
+  case $foreground in
+    a) foreground_ansi=0;;
+    b) foreground_ansi=31;;
+    c) foreground_ansi=32;;
+    d) foreground_ansi=33;;
+    e) foreground_ansi=34;;
+    f) foreground_ansi=35;;
+    g) foreground_ansi=36;;
+    h) foreground_ansi=37;;
+    x) foreground_ansi=0;;
+  esac
+  case $background in
+    a) background_ansi=40;;
+    b) background_ansi=41;;
+    c) background_ansi=42;;
+    d) background_ansi=43;;
+    e) background_ansi=44;;
+    f) background_ansi=45;;
+    g) background_ansi=46;;
+    h) background_ansi=47;;
+    x) background_ansi=40;;
+  esac
+  eval "$1=\"${foreground_ansi};${background_ansi}\""
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
