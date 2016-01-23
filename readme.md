@@ -83,7 +83,7 @@ Source the script
 ```shell
 source $HOME/k/k.sh
 ```
-Put the same line in your `.zshrc` to have `k` availble whenever you start a shell. If you don't know what your `.zshrc` is, just do this.
+Put the same line in your `.zshrc` to have `k` available whenever you start a shell. If you don't know what your `.zshrc` is, just do this.
 
 ```shell
 print "source $HOME/k/k.sh" >> $HOME/.zshrc
@@ -101,19 +101,19 @@ k
 zsh 4.3.11  
 Git 1.7.2
 
-## Contributers
-[supercrabtree](https://api.github.com/users/supercrabtree)  
-[zirrostig](https://api.github.com/users/zirrostig)  
-[chrstphrknwtn](https://api.github.com/users/chrstphrknwtn)  
-[lejeunerenard](https://api.github.com/users/lejeunerenard)  
-[jozefizso](https://api.github.com/users/jozefizso)  
-[unixorn](https://api.github.com/users/unixorn)  
-[george-b](https://api.github.com/users/george-b)  
-[philpennock](https://api.github.com/users/philpennock)  
-[hoelzro](https://api.github.com/users/hoelzro)  
-[srijanshetty](https://api.github.com/users/srijanshetty)  
-[zblach](https://api.github.com/users/zblach)  
-[mattboll](https://api.github.com/users/mattboll)  
+## Contributors
+[supercrabtree](https://github.com/supercrabtree)
+[zirrostig](https://github.com/zirrostig)
+[chrstphrknwtn](https://github.com/chrstphrknwtn)
+[lejeunerenard](https://github.com/lejeunerenard)
+[jozefizso](https://github.com/jozefizso)
+[unixorn](https://github.com/unixorn)
+[george-b](https://github.com/george-b)
+[philpennock](https://github.com/philpennock)
+[hoelzro](https://github.com/hoelzro)
+[srijanshetty](https://github.com/srijanshetty)
+[zblach](https://github.com/zblach)
+[mattboll](https://github.com/mattboll) 
 Pull requests welcome :smile:
 
 ## Thanks
