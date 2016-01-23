@@ -34,9 +34,16 @@ Dates fade with age.
 
 ## Installation
 
+### Using [zplug](https://github.com/b4b4r07/zplug)
+Load k as a plugin in your `.zshrc`
+
+```shell
+zplug "rimraf/k"
+```
+
 ### Using [Antigen](https://github.com/zsh-users/antigen)
 
-Include the bundle in your `.zshrc`
+Bundle k in your `.zshrc`
 
 ```shell
 antigen bundle rimraf/k
@@ -53,10 +60,20 @@ zgen save
 ```
 
 ### Manually
-Put `k.sh` somewhere, and source it in your `.zshrc`.
+Clone this repository somewhere (~/k for example)
 
 ```shell
-source ~/path-to/k/k.sh
+git clone git@github.com:rimraf/k.git $HOME/k
+```
+Source the script
+
+```shell
+source $HOME/k/k.sh
+```
+Put the same line in your `.zshrc` to have `k` availble whenever you start a shell. If you don't know what your `.zshrc` is, just do this.
+
+```shell
+print "source $HOME/k/k.sh" >> $HOME/.zshrc
 ```
 
 ## Usage
@@ -65,31 +82,30 @@ Hit k in your shell
 ```shell
 k
 ```
+:open_mouth:
 
 ## Minimum Requirements
 zsh 4.3.11  
 Git 1.7.2
 
 ## Contributers
-Pull requests welcome.  
-[supercrabtree](https://github.com/supercrabtree) 56  
-[chrstphrknwtn](https://github.com/chrstphrknwtn) 44  
-[zirrostig](https://github.com/zirrostig) 19  
-[lejeunerenard](https://github.com/lejeunerenard) 2  
-[george-b](https://github.com/george-b) 1  
-[pixcrabtree](https://github.com/pixcrabtree) 1  
-[jozefizso](https://github.com/jozefizso) 1  
-[philpennock](https://github.com/philpennock) 1  
-[hoelzro](https://github.com/hoelzro) 1  
-[srijanshetty](https://github.com/srijanshetty) 1  
-[mattboll](https://github.com/mattboll) 1  
-
-We'd like to make this POSIX compliant so that it can be used with bash and other shells. But don't really know anything about shell scripting, so if you think you could help that would be coooool :)
+[supercrabtree](https://api.github.com/users/supercrabtree)  
+[zirrostig](https://api.github.com/users/zirrostig)  
+[chrstphrknwtn](https://api.github.com/users/chrstphrknwtn)  
+[lejeunerenard](https://api.github.com/users/lejeunerenard)  
+[jozefizso](https://api.github.com/users/jozefizso)  
+[unixorn](https://api.github.com/users/unixorn)  
+[george-b](https://api.github.com/users/george-b)  
+[philpennock](https://api.github.com/users/philpennock)  
+[hoelzro](https://api.github.com/users/hoelzro)  
+[srijanshetty](https://api.github.com/users/srijanshetty)  
+[zblach](https://api.github.com/users/zblach)  
+[mattboll](https://api.github.com/users/mattboll)  
+Pull requests welcome :smile:
 
 ## Thanks
-[Paul Falstad](http://www.falstad.com/) for zsh  
-[Robby Russell](https://github.com/robbyrussell) for making the shell fun with oh my zsh  
-[Sindre Sorhus](https://github.com/sindresorhus) for fast git commands from zsh pure theme  
+[Paul Falstad](http://www.falstad.com/) for zsh   
+[Sindre Sorhus](https://github.com/sindresorhus) for the fast git commands from zsh pure theme  
 [Rupa](https://github.com/rupa/z) for that slammin' strapline  
 
 Copyright © 2015 George Crabtree & Christopher Newton. MIT License.
