@@ -39,6 +39,15 @@ Load k as a plugin in your `.zshrc`
 
 ```shell
 zplug "rimraf/k"
+
+```
+### Using [zgen](https://github.com/tarjoilija/zgen)
+
+Include the load command in your `.zshrc`
+
+```shell
+zgen load rimraf/k
+zgen save
 ```
 
 ### Using [Antigen](https://github.com/zsh-users/antigen)
@@ -50,13 +59,17 @@ antigen bundle rimraf/k
 antigen apply
 ```
 
-### Using [zgen](https://github.com/tarjoilija/zgen)
+### As an [Oh My ZSH!](https://github.com/robbyrussell/oh-my-zsh) custom plugin
 
-Include the load command in your `.zshrc`
+Clone k into your custom plugins repo
 
 ```shell
-zgen load rimraf/k
-zgen save
+git clone https://github.com/rimraf/k $HOME/.oh-my-zsh/custom/plugins/k
+```
+Then load as a plugin in your `.zshrc`
+
+```shell
+plugins+=(k)`
 ```
 
 ### Manually
