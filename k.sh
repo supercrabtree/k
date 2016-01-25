@@ -95,16 +95,24 @@ k () {
   # Colors
   # ----------------------------------------------------------------------------
   # default colors
-  K_COLOR_DI="0;34" # di:directory
-  K_COLOR_LN="0;35" # ln:symlink
-  K_COLOR_EX="0;31" # ex:executable
+  K_COLOR_DI="0;34" #  di:directory
+  K_COLOR_LN="0;35" #  ln:symlink
+  K_COLOR_LN="0;32" #  so:socket
+  K_COLOR_PI="0;33" #  pi:pipe
+  K_COLOR_EX="0;31" #  ex:executable
+  K_COLOR_BD="34;46" # bd:block special
+  K_COLOR_CD="34;43" # cd:character special
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
     # Translate OSX/BSD's LSCOLORS so we can use the same here
-    _k_bsd_to_ansi K_COLOR_DI $LSCOLORS[1] $LSCOLORS[2]
-    _k_bsd_to_ansi K_COLOR_LN $LSCOLORS[3] $LSCOLORS[4]
-    _k_bsd_to_ansi K_COLOR_EX $LSCOLORS[9] $LSCOLORS[10]
+    _k_bsd_to_ansi K_COLOR_DI $LSCOLORS[1]  $LSCOLORS[2]
+    _k_bsd_to_ansi K_COLOR_LN $LSCOLORS[3]  $LSCOLORS[4]
+    _k_bsd_to_ansi K_COLOR_SO $LSCOLORS[5]  $LSCOLORS[6]
+    _k_bsd_to_ansi K_COLOR_PI $LSCOLORS[7]  $LSCOLORS[8]
+    _k_bsd_to_ansi K_COLOR_EX $LSCOLORS[9]  $LSCOLORS[10]
+    _k_bsd_to_ansi K_COLOR_BD $LSCOLORS[11] $LSCOLORS[12]
+    _k_bsd_to_ansi K_COLOR_CD $LSCOLORS[13] $LSCOLORS[14]
   fi
 
   # read colors if linux and $LS_COLORS is defined
@@ -269,7 +277,7 @@ k () {
     typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE FILESIZE_OUT DATE NAME SYMLINK_TARGET
     typeset FILETYPE PER1 PER2 PER3 PERMISSIONS_OUTPUT STATUS
     typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
-    typeset -i IS_DIRECTORY IS_SYMLINK IS_EXECUTABLE
+    typeset -i IS_DIRECTORY IS_SYMLINK IS_SOCKET IS_PIPE IS_EXECUTABLE IS_BLOCK_SPECIAL IS_CHARACTER_SPECIAL
     typeset -i COLOR
 
     k=1
@@ -281,7 +289,11 @@ k () {
       REPOMARKER=" "
       IS_DIRECTORY=0
       IS_SYMLINK=0
+      IS_SOCKET=0
+      IS_PIPE=0
       IS_EXECUTABLE=0
+      IS_BLOCK_SPECIAL=0
+      IS_CHARACTER_SPECIAL=0
 
          PERMISSIONS="${sv[mode]}"
        HARDLINKCOUNT="${sv[nlink]}"
@@ -294,7 +306,12 @@ k () {
 
       # Check for file types
       if [[ -d "$NAME" ]]; then IS_DIRECTORY=1; fi
-      if [[ -L "$NAME" ]]; then   IS_SYMLINK=1; fi
+      if [[ -L "$NAME" ]]; then IS_SYMLINK=1; fi
+      if [[ -S "$NAME" ]]; then IS_SOCKET=1; fi
+      if [[ -p "$NAME" ]]; then IS_PIPE=1; fi
+      if [[ -x "$NAME" ]]; then IS_EXECUTABLE=1; fi
+      if [[ -b "$NAME" ]]; then IS_BLOCK_SPECIAL=1; fi
+      if [[ -c "$NAME" ]]; then IS_CHARACTER_SPECIAL=1; fi
 
       # IS_GIT_REPO is a 1 if $NAME is a file/directory in a git repo, OR if $NAME is a git-repo itself
       # GIT_TOPLEVEL is set to the directory containing the .git folder of a git-repo
@@ -338,16 +355,15 @@ k () {
       # --------------------------------------------------------------------------
       # Colour the first character based on filetype
       FILETYPE="${PERMISSIONS[1]}"
-      if (( IS_DIRECTORY ))
-        then
-        FILETYPE=${FILETYPE//d/$'\e[1;36m'd$'\e[0m'};
-      elif (( IS_SYMLINK ))
-        then
-        FILETYPE=${FILETYPE//l/$'\e[0;35m'l$'\e[0m'};
-      elif [[ $FILETYPE == "-" ]];
-        then
-        FILETYPE=${FILETYPE//-/$'\e[0;37m'-$'\e[0m'};
-      fi
+
+      #   if [[ $IS_DIRECTORY          == 1 ]];   then FILETYPE=${FILETYPE//d/$'\e['"$K_COLOR_DI"'m'd$'\e[0m'};
+      # elif [[ $IS_SYMLINK            == 1 ]];   then FILETYPE=${FILETYPE//l/$'\e['"$K_COLOR_LN"'m'l$'\e[0m'};
+      # elif [[ $IS_SOCKET             == 1 ]];   then FILETYPE=${FILETYPE//s/$'\e['"$K_COLOR_SO"'m's$'\e[0m'};
+      # elif [[ $IS_PIPE               == 1 ]];   then FILETYPE=${FILETYPE//p/$'\e['"$K_COLOR_PI"'m'p$'\e[0m'};
+      # elif [[ $IS_BLOCK_SPECIAL      == 1 ]];   then FILETYPE=${FILETYPE//b/$'\e['"$K_COLOR_CD"'m'p$'\e[0m'};
+      # elif [[ $IS_CHARACTER_SPECIAL  == 1 ]];   then FILETYPE=${FILETYPE//c/$'\e['"$K_COLOR_BD"'m'p$'\e[0m'};
+      # elif [[ $FILETYPE              == "-" ]]; then FILETYPE=${FILETYPE//-/$'\e[0m'-$'\e[0m'};
+      # fi
 
       # Permissions Owner
       PER1="${PERMISSIONS[2,4]}"
@@ -461,12 +477,13 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-      if (( IS_DIRECTORY ))
-      then
-        NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m'
-      elif (( IS_SYMLINK ))
-      then
-        NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m'
+        if [[ $IS_DIRECTORY         == 1 ]]; then NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_SYMLINK           == 1 ]]; then NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_SOCKET            == 1 ]]; then NAME=$'\e['"$K_COLOR_SO"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_PIPE              == 1 ]]; then NAME=$'\e['"$K_COLOR_PI"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_EXECUTABLE        == 1 ]]; then NAME=$'\e['"$K_COLOR_EX"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_CHARACTER_SPECIAL == 1 ]]; then NAME=$'\e['"$K_COLOR_CD"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_BLOCK_SPECIAL     == 1 ]]; then NAME=$'\e['"$K_COLOR_BD"'m'"$NAME"$'\e[0m';
       fi
 
       # --------------------------------------------------------------------------
@@ -487,7 +504,7 @@ k () {
 _k_bsd_to_ansi() {
   local foreground=$2 background=$3 foreground_ansi background_ansi
   case $foreground in
-    a) foreground_ansi=0;;
+    a) foreground_ansi=30;;
     b) foreground_ansi=31;;
     c) foreground_ansi=32;;
     d) foreground_ansi=33;;
@@ -506,9 +523,9 @@ _k_bsd_to_ansi() {
     f) background_ansi=45;;
     g) background_ansi=46;;
     h) background_ansi=47;;
-    x) background_ansi=40;;
+    x) background_ansi=0;;
   esac
-  eval "$1=\"${foreground_ansi};${background_ansi}\""
+  eval "$1=\"${background_ansi};${foreground_ansi}\""
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
