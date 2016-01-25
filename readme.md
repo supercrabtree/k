@@ -103,8 +103,8 @@ Git 1.7.2
 
 ## Contributors
 [supercrabtree](https://github.com/supercrabtree)  
-[zirrostig](https://github.com/zirrostig)  
 [chrstphrknwtn](https://github.com/chrstphrknwtn)  
+[zirrostig](https://github.com/zirrostig)  
 [lejeunerenard](https://github.com/lejeunerenard)  
 [jozefizso](https://github.com/jozefizso)  
 [unixorn](https://github.com/unixorn)  
