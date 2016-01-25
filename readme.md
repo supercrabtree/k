@@ -102,19 +102,19 @@ zsh 4.3.11
 Git 1.7.2
 
 ## Contributors
-[supercrabtree](https://github.com/supercrabtree)
-[zirrostig](https://github.com/zirrostig)
-[chrstphrknwtn](https://github.com/chrstphrknwtn)
-[lejeunerenard](https://github.com/lejeunerenard)
-[jozefizso](https://github.com/jozefizso)
-[unixorn](https://github.com/unixorn)
-[george-b](https://github.com/george-b)
-[philpennock](https://github.com/philpennock)
-[hoelzro](https://github.com/hoelzro)
-[srijanshetty](https://github.com/srijanshetty)
-[zblach](https://github.com/zblach)
-[mattboll](https://github.com/mattboll) 
-Pull requests welcome :smile:
+[supercrabtree](https://github.com/supercrabtree)  
+[zirrostig](https://github.com/zirrostig)  
+[chrstphrknwtn](https://github.com/chrstphrknwtn)  
+[lejeunerenard](https://github.com/lejeunerenard)  
+[jozefizso](https://github.com/jozefizso)  
+[unixorn](https://github.com/unixorn)  
+[george-b](https://github.com/george-b)  
+[philpennock](https://github.com/philpennock)  
+[hoelzro](https://github.com/hoelzro)  
+[srijanshetty](https://github.com/srijanshetty)  
+[zblach](https://github.com/zblach)  
+[mattboll](https://github.com/mattboll)  
+Pull requests welcome :smile:  
 
 ## Thanks
 [Paul Falstad](http://www.falstad.com/) for zsh   
