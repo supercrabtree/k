@@ -111,17 +111,17 @@ k () {
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
     # Translate OSX/BSD's LSCOLORS so we can use the same here
-    _k_bsd_to_ansi K_COLOR_DI $LSCOLORS[1]  $LSCOLORS[2]
-    _k_bsd_to_ansi K_COLOR_LN $LSCOLORS[3]  $LSCOLORS[4]
-    _k_bsd_to_ansi K_COLOR_SO $LSCOLORS[5]  $LSCOLORS[6]
-    _k_bsd_to_ansi K_COLOR_PI $LSCOLORS[7]  $LSCOLORS[8]
-    _k_bsd_to_ansi K_COLOR_EX $LSCOLORS[9]  $LSCOLORS[10]
-    _k_bsd_to_ansi K_COLOR_BD $LSCOLORS[11] $LSCOLORS[12]
-    _k_bsd_to_ansi K_COLOR_CD $LSCOLORS[13] $LSCOLORS[14]
-    _k_bsd_to_ansi K_COLOR_SU $LSCOLORS[15] $LSCOLORS[16]
-    _k_bsd_to_ansi K_COLOR_SG $LSCOLORS[17] $LSCOLORS[18]
-    _k_bsd_to_ansi K_COLOR_TW $LSCOLORS[17] $LSCOLORS[18]
-    _k_bsd_to_ansi K_COLOR_OW $LSCOLORS[19] $LSCOLORS[20]
+    K_COLOR_DI=$(_k_bsd_to_ansi $LSCOLORS[1]  $LSCOLORS[2])
+    K_COLOR_LN=$(_k_bsd_to_ansi $LSCOLORS[3]  $LSCOLORS[4])
+    K_COLOR_SO=$(_k_bsd_to_ansi $LSCOLORS[5]  $LSCOLORS[6])
+    K_COLOR_PI=$(_k_bsd_to_ansi $LSCOLORS[7]  $LSCOLORS[8])
+    K_COLOR_EX=$(_k_bsd_to_ansi $LSCOLORS[9]  $LSCOLORS[10])
+    K_COLOR_BD=$(_k_bsd_to_ansi $LSCOLORS[11] $LSCOLORS[12])
+    K_COLOR_CD=$(_k_bsd_to_ansi $LSCOLORS[13] $LSCOLORS[14])
+    K_COLOR_SU=$(_k_bsd_to_ansi $LSCOLORS[15] $LSCOLORS[16])
+    K_COLOR_SG=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
+    K_COLOR_TW=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
+    K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[19] $LSCOLORS[20])
   fi
 
   # read colors if linux and $LS_COLORS is defined
@@ -527,7 +527,7 @@ k () {
 }
 
 _k_bsd_to_ansi() {
-  local foreground=$2 background=$3 foreground_ansi background_ansi
+  local foreground=$1 background=$2 foreground_ansi background_ansi
   case $foreground in
     a) foreground_ansi=30;;
     b) foreground_ansi=31;;
@@ -550,7 +550,7 @@ _k_bsd_to_ansi() {
     h) background_ansi=47;;
     x) background_ansi=0;;
   esac
-  eval "$1=\"${background_ansi};${foreground_ansi}\""
+  printf "%s;%s" $foreground_ansi $background_ansi
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
