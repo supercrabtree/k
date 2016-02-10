@@ -1,4 +1,4 @@
-[![k.rimraf.com](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png)](http://k.rimraf.com)
+[![k.supercrabtree.com](https://raw.githubusercontent.com/supercrabtree/k/gh-pages/k-logo.png)](http://k.supercrabtree.com)
 
 > k is the new l, yo
 
@@ -38,7 +38,7 @@ Dates fade with age.
 Load k as a plugin in your `.zshrc`
 
 ```shell
-zplug "rimraf/k"
+zplug "supercrabtree/k"
 
 ```
 ### Using [zgen](https://github.com/tarjoilija/zgen)
@@ -46,7 +46,7 @@ zplug "rimraf/k"
 Include the load command in your `.zshrc`
 
 ```shell
-zgen load rimraf/k
+zgen load supercrabtree/k
 zgen save
 ```
 
@@ -55,7 +55,7 @@ zgen save
 Bundle k in your `.zshrc`
 
 ```shell
-antigen bundle rimraf/k
+antigen bundle supercrabtree/k
 antigen apply
 ```
 
@@ -64,7 +64,7 @@ antigen apply
 Clone k into your custom plugins repo
 
 ```shell
-git clone https://github.com/rimraf/k $HOME/.oh-my-zsh/custom/plugins/k
+git clone https://github.com/supercrabtree/k $HOME/.oh-my-zsh/custom/plugins/k
 ```
 Then load as a plugin in your `.zshrc`
 
@@ -76,7 +76,7 @@ plugins+=(k)`
 Clone this repository somewhere (~/k for example)
 
 ```shell
-git clone git@github.com:rimraf/k.git $HOME/k
+git clone git@github.com:supercrabtree/k.git $HOME/k
 ```
 Source the script
 
