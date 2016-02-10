@@ -92,16 +92,21 @@ k () {
     base_dirs=($@)
   fi
 
+
   # Colors
   # ----------------------------------------------------------------------------
   # default colors
-  K_COLOR_DI="0;34" #  di:directory
-  K_COLOR_LN="0;35" #  ln:symlink
-  K_COLOR_LN="0;32" #  so:socket
-  K_COLOR_PI="0;33" #  pi:pipe
-  K_COLOR_EX="0;31" #  ex:executable
+  K_COLOR_DI="0;34"  # di:directory
+  K_COLOR_LN="0;35"  # ln:symlink
+  K_COLOR_SO="0;32"  # so:socket
+  K_COLOR_PI="0;33"  # pi:pipe
+  K_COLOR_EX="0;31"  # ex:executable
   K_COLOR_BD="34;46" # bd:block special
   K_COLOR_CD="34;43" # cd:character special
+  K_COLOR_SU="30;41" # su:executable with setuid bit set
+  K_COLOR_SG="30;46" # sg:executable with setgid bit set
+  K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
+  K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
@@ -113,6 +118,10 @@ k () {
     _k_bsd_to_ansi K_COLOR_EX $LSCOLORS[9]  $LSCOLORS[10]
     _k_bsd_to_ansi K_COLOR_BD $LSCOLORS[11] $LSCOLORS[12]
     _k_bsd_to_ansi K_COLOR_CD $LSCOLORS[13] $LSCOLORS[14]
+    _k_bsd_to_ansi K_COLOR_SU $LSCOLORS[15] $LSCOLORS[16]
+    _k_bsd_to_ansi K_COLOR_SG $LSCOLORS[17] $LSCOLORS[18]
+    _k_bsd_to_ansi K_COLOR_TW $LSCOLORS[17] $LSCOLORS[18]
+    _k_bsd_to_ansi K_COLOR_OW $LSCOLORS[19] $LSCOLORS[20]
   fi
 
   # read colors if linux and $LS_COLORS is defined
@@ -277,7 +286,7 @@ k () {
     typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE FILESIZE_OUT DATE NAME SYMLINK_TARGET
     typeset FILETYPE PER1 PER2 PER3 PERMISSIONS_OUTPUT STATUS
     typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
-    typeset -i IS_DIRECTORY IS_SYMLINK IS_SOCKET IS_PIPE IS_EXECUTABLE IS_BLOCK_SPECIAL IS_CHARACTER_SPECIAL
+    typeset -i IS_DIRECTORY IS_SYMLINK IS_SOCKET IS_PIPE IS_EXECUTABLE IS_BLOCK_SPECIAL IS_CHARACTER_SPECIAL HAS_UID_BIT HAS_GID_BIT HAS_STICKY_BIT IS_WRITABLE_BY_OTHERS
     typeset -i COLOR
 
     k=1
@@ -294,6 +303,9 @@ k () {
       IS_EXECUTABLE=0
       IS_BLOCK_SPECIAL=0
       IS_CHARACTER_SPECIAL=0
+      HAS_UID_BIT=0
+      HAS_GID_BIT=0
+      HAS_STICKY_BIT=0
 
          PERMISSIONS="${sv[mode]}"
        HARDLINKCOUNT="${sv[nlink]}"
@@ -312,6 +324,10 @@ k () {
       if [[ -x "$NAME" ]]; then IS_EXECUTABLE=1; fi
       if [[ -b "$NAME" ]]; then IS_BLOCK_SPECIAL=1; fi
       if [[ -c "$NAME" ]]; then IS_CHARACTER_SPECIAL=1; fi
+      if [[ -u "$NAME" ]]; then HAS_UID_BIT=1; fi
+      if [[ -g "$NAME" ]]; then HAS_GID_BIT=1; fi
+      if [[ -k "$NAME" ]]; then HAS_STICKY_BIT=1; fi
+      if [[ $PERMISSIONS[9] == 'w' ]]; then IS_WRITABLE_BY_OTHERS=1; fi
 
       # IS_GIT_REPO is a 1 if $NAME is a file/directory in a git repo, OR if $NAME is a git-repo itself
       # GIT_TOPLEVEL is set to the directory containing the .git folder of a git-repo
@@ -477,13 +493,22 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-        if [[ $IS_DIRECTORY         == 1 ]]; then NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
+        if [[ $IS_DIRECTORY         == 1 ]]; then
+          if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
+            if [[ $HAS_STICKY_BIT == 1 ]]; then
+              NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
+            fi
+            NAME=$'\e['"$K_COLOR_OW"'m'"$NAME"$'\e[0m';
+          fi
+          NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
       elif [[ $IS_SYMLINK           == 1 ]]; then NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m';
       elif [[ $IS_SOCKET            == 1 ]]; then NAME=$'\e['"$K_COLOR_SO"'m'"$NAME"$'\e[0m';
       elif [[ $IS_PIPE              == 1 ]]; then NAME=$'\e['"$K_COLOR_PI"'m'"$NAME"$'\e[0m';
+      elif [[ $HAS_UID_BIT          == 1 ]]; then NAME=$'\e['"$K_COLOR_SU"'m'"$NAME"$'\e[0m';
+      elif [[ $HAS_GID_BIT          == 1 ]]; then NAME=$'\e['"$K_COLOR_SG"'m'"$NAME"$'\e[0m';
       elif [[ $IS_EXECUTABLE        == 1 ]]; then NAME=$'\e['"$K_COLOR_EX"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_CHARACTER_SPECIAL == 1 ]]; then NAME=$'\e['"$K_COLOR_CD"'m'"$NAME"$'\e[0m';
       elif [[ $IS_BLOCK_SPECIAL     == 1 ]]; then NAME=$'\e['"$K_COLOR_BD"'m'"$NAME"$'\e[0m';
+      elif [[ $IS_CHARACTER_SPECIAL == 1 ]]; then NAME=$'\e['"$K_COLOR_CD"'m'"$NAME"$'\e[0m';
       fi
 
       # --------------------------------------------------------------------------
