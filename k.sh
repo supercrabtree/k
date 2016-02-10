@@ -372,15 +372,6 @@ k () {
       # Colour the first character based on filetype
       FILETYPE="${PERMISSIONS[1]}"
 
-      #   if [[ $IS_DIRECTORY          == 1 ]];   then FILETYPE=${FILETYPE//d/$'\e['"$K_COLOR_DI"'m'd$'\e[0m'};
-      # elif [[ $IS_SYMLINK            == 1 ]];   then FILETYPE=${FILETYPE//l/$'\e['"$K_COLOR_LN"'m'l$'\e[0m'};
-      # elif [[ $IS_SOCKET             == 1 ]];   then FILETYPE=${FILETYPE//s/$'\e['"$K_COLOR_SO"'m's$'\e[0m'};
-      # elif [[ $IS_PIPE               == 1 ]];   then FILETYPE=${FILETYPE//p/$'\e['"$K_COLOR_PI"'m'p$'\e[0m'};
-      # elif [[ $IS_BLOCK_SPECIAL      == 1 ]];   then FILETYPE=${FILETYPE//b/$'\e['"$K_COLOR_CD"'m'p$'\e[0m'};
-      # elif [[ $IS_CHARACTER_SPECIAL  == 1 ]];   then FILETYPE=${FILETYPE//c/$'\e['"$K_COLOR_BD"'m'p$'\e[0m'};
-      # elif [[ $FILETYPE              == "-" ]]; then FILETYPE=${FILETYPE//-/$'\e[0m'-$'\e[0m'};
-      # fi
-
       # Permissions Owner
       PER1="${PERMISSIONS[2,4]}"
 
