@@ -95,7 +95,7 @@ Hit k in your shell
 ```shell
 k
 ```
-:open_mouth:
+# 😮
 
 ## Minimum Requirements
 zsh 4.3.11  
