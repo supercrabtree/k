@@ -120,8 +120,8 @@ k () {
     K_COLOR_CD=$(_k_bsd_to_ansi $LSCOLORS[13] $LSCOLORS[14])
     K_COLOR_SU=$(_k_bsd_to_ansi $LSCOLORS[15] $LSCOLORS[16])
     K_COLOR_SG=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
-    K_COLOR_TW=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
-    K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[19] $LSCOLORS[20])
+    K_COLOR_TW=$(_k_bsd_to_ansi $LSCOLORS[19] $LSCOLORS[20])
+    K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[21] $LSCOLORS[22])
   fi
 
   # read colors if linux and $LS_COLORS is defined
