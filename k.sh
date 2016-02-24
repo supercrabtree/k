@@ -472,9 +472,12 @@ k () {
       # --------------------------------------------------------------------------
       # Unfortunately, the choices for quoting which escape ANSI color sequences are q & qqqq; none of q- qq qqq work.
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
-      NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
+      NAME="${${${NAME%/}##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
         if [[ $IS_DIRECTORY         == 1 ]]; then
+          if [[ $options[mark_dirs] == on ]]; then
+            NAME="${NAME}/"
+          fi
           if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
             if [[ $HAS_STICKY_BIT == 1 ]]; then
               NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
