@@ -531,7 +531,7 @@ _k_bsd_to_ansi() {
     h) background_ansi=47;;
     x) background_ansi=0;;
   esac
-  printf "%s;%s" $foreground_ansi $background_ansi
+  printf "%s;%s" $background_ansi $foreground_ansi
 }
 
 # http://upload.wikimedia.org/wikipedia/en/1/15/Xterm_256color_chart.svg
