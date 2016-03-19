@@ -474,14 +474,14 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-        if [[ $IS_DIRECTORY         == 1 ]]; then
-          if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
-            if [[ $HAS_STICKY_BIT == 1 ]]; then
-              NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
-            fi
-            NAME=$'\e['"$K_COLOR_OW"'m'"$NAME"$'\e[0m';
+      if [[ $IS_DIRECTORY == 1 ]]; then
+        if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
+          if [[ $HAS_STICKY_BIT == 1 ]]; then
+            NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
           fi
-          NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
+          NAME=$'\e['"$K_COLOR_OW"'m'"$NAME"$'\e[0m';
+        fi
+        NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
       elif [[ $IS_SYMLINK           == 1 ]]; then NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m';
       elif [[ $IS_SOCKET            == 1 ]]; then NAME=$'\e['"$K_COLOR_SO"'m'"$NAME"$'\e[0m';
       elif [[ $IS_PIPE              == 1 ]]; then NAME=$'\e['"$K_COLOR_PI"'m'"$NAME"$'\e[0m';
