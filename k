@@ -1,5 +1,6 @@
 #!/bin/sh
 
+number_of_params=
 die() { printf "%s\n" "$*" >&2; exit 1; }
 fin() { printf "%s\n" "$*"; exit 0; }
 
@@ -17,7 +18,7 @@ list() {
 }
 
 list_dir() {
-  echo $1
+  [ $number_of_params -ne 1 ] && printf "\n%s:\n" "$1"
 }
 
 list_item() {
@@ -51,6 +52,7 @@ IFS=\0
 set -- $remaining
 [ "$#" -eq 0 ] && set -- .
 
+number_of_params="$#"
 while [ "$#" -gt 0 ]; do
   list "$1"
   shift
