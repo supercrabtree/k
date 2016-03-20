@@ -43,7 +43,7 @@ while [ "$#" -gt 0 ]; do
     *)
       # if $1 starts with a -
       if [ $(echo "$1" | cut -c-1) = "-" ]; then
-        printf "Unknown option %s\n" "$1"
+        printf "k: illegal option: %s\n" "$1"
         usage
         die
       else
