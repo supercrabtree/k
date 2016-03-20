@@ -12,7 +12,7 @@ die() { printf "%s\n" "$*" >&2; exit 1; }
 fin() { printf "%s\n" "$*"; exit 0; }
 
 usage() {
-  printf "Help!!"
+  printf "usage: k [-aA]"
 }
 
 list() {
