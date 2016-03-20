@@ -1,6 +1,13 @@
 #!/bin/sh
 
+
+# Script varibles
+# ------------------------------------------------------------------------------
 number_of_params=
+
+
+# Local functions
+# ------------------------------------------------------------------------------
 die() { printf "%s\n" "$*" >&2; exit 1; }
 fin() { printf "%s\n" "$*"; exit 0; }
 
@@ -50,9 +57,13 @@ done
 # reset "$@" to args not caught by the switch case above
 IFS=\0
 set -- $remaining
+
+# set default param as local dir
 [ "$#" -eq 0 ] && set -- .
 
+# used later in local function
 number_of_params="$#"
+
 while [ "$#" -gt 0 ]; do
   list "$1"
   shift
