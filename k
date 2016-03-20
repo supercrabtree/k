@@ -21,7 +21,7 @@ while [ "$#" -gt 0 ]; do
         usage
         die
       else
-        remaining="$remaining$1 "
+        remaining="$remaining$1"\0
       fi
     ;;
   esac
