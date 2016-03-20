@@ -16,8 +16,8 @@ while [ "$#" -gt 0 ]; do
     --help)          usage; fin;;
     *)
       # if $1 starts with a -
-      if [ $(echo $1 | cut -c-1) = "-" ]; then
-        printf "Unknown option %s\n" $1
+      if [ $(echo "$1" | cut -c-1) = "-" ]; then
+        printf "Unknown option %s\n" "$1"
         usage
         die
       else
