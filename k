@@ -16,7 +16,7 @@ usage() {
 }
 
 is_git_repo() {
-  res=" $(cd "$1" && command git rev-parse --is-inside-work-tree 2>/dev/null)"
+  res=" $(builtin cd "$root_dir/$1" && command git rev-parse --is-inside-work-tree 2>/dev/null)"
   [ "$res" = " true" ] && return 0 || return 1
 }
 
