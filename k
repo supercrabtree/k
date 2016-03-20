@@ -7,6 +7,7 @@ usage() {
   printf "Help!!"
 }
 
+
 # Parse opts
 # ------------------------------------------------------------------------------
 while [ "$#" -gt 0 ]; do
@@ -27,7 +28,6 @@ while [ "$#" -gt 0 ]; do
   esac
   shift
 done
-
 
 # reset "$@" to args not caught by the switch case above
 IFS=\0
