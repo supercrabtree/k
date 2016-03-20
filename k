@@ -14,7 +14,13 @@ while [ "$#" -gt 0 ]; do
     -a|--all)        flag_all=1;;
     -A|--almost-all) flag_almost_all=1;;
     --help)          usage;;
-    *)               remaining="$remaining$1 ";;
+    *)
+      if [ $(echo $1 | cut -c-1) = "-" ]; then
+        die "Unknown option $1"
+      else
+        remaining="$remaining$1 "
+      fi
+    ;;
   esac
   shift
 done
