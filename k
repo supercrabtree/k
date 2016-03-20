@@ -7,6 +7,23 @@ usage() {
   printf "Help!!"
 }
 
+list() {
+  [ ! -e "$1" ] && die "k: $1: No such file or directory"
+  if [ -d "$1" ]; then
+    list_dir "$1"
+  else
+    list_item "$1"
+  fi
+}
+
+list_dir() {
+  echo $1
+}
+
+list_item() {
+  echo $1
+}
+
 
 # Parse opts
 # ------------------------------------------------------------------------------
@@ -34,3 +51,7 @@ IFS=\0
 set -- $remaining
 [ "$#" -eq 0 ] && set -- .
 
+while [ "$#" -gt 0 ]; do
+  list "$1"
+  shift
+done
