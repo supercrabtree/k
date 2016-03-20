@@ -32,4 +32,5 @@ done
 # reset "$@" to args not caught by the switch case above
 IFS=\0
 set -- $remaining
+[ "$#" -eq 0 ] && set -- .
 
