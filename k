@@ -15,9 +15,9 @@ usage() {
   printf "usage: k [-aA]"
 }
 
-test_is_git_repo() {
-  res=" $(command git rev-parse --is-inside-work-tree 2>/dev/null)"
-  [ "$res" = " " ] && printf 0 || printf 1
+is_git_repo() {
+  res=" $(cd "$1" && command git rev-parse --is-inside-work-tree 2>/dev/null)"
+  [ "$res" = " true" ] && return 0 || return 1
 }
 
 list() {
