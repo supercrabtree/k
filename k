@@ -69,6 +69,9 @@ set -- $remaining
 # used later in local function
 number_of_params="$#"
 
+
+# Finally, run k against all params
+# ------------------------------------------------------------------------------
 while [ "$#" -gt 0 ]; do
   list "$1"
   shift
