@@ -15,6 +15,11 @@ usage() {
   printf "usage: k [-aA]"
 }
 
+test_is_git_repo() {
+  res=" $(command git rev-parse --is-inside-work-tree 2>/dev/null)"
+  [ "$res" = " " ] && printf 0 || printf 1
+}
+
 list() {
   [ ! -e "$1" ] && die "k: $1: No such file or directory"
   if [ -d "$1" ]; then
