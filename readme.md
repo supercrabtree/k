@@ -69,7 +69,7 @@ git clone https://github.com/supercrabtree/k $HOME/.oh-my-zsh/custom/plugins/k
 Then load as a plugin in your `.zshrc`
 
 ```shell
-plugins+=(k)`
+plugins+=(k)
 ```
 
 ### Manually
