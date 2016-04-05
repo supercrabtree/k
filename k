@@ -4,6 +4,7 @@
 # Script varibles
 # ------------------------------------------------------------------------------
 number_of_params=
+root_dir=$(pwd)
 
 
 # Local functions
@@ -30,7 +31,11 @@ list() {
 }
 
 list_dir() {
-  [ $number_of_params -ne 1 ] && printf "\n%s:\n" "$1"
+  dir="$1"
+  [ $number_of_params -ne 1 ] && printf "\n%s:\n" "$dir"
+  if is_git_repo "$dir"; then
+    git_status=$(builtin cd "$root_dir/$dir" && git status --porcelain)
+  fi
 }
 
 list_item() {
