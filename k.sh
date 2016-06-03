@@ -85,6 +85,7 @@ k () {
 
   # Setup array of directories to print
   typeset -a base_dirs
+  typeset base_dir
 
   if [[ "$@" == "" ]]; then
     base_dirs=.
