@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "test": "ava",
     "start": "ava --watch"
