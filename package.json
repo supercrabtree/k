@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "test": "ava",
+    "start": "ava --watch"
+  },
+  "devDependencies": {
+    "ava": "0.15.2"
+  }
+}
