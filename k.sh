@@ -8,7 +8,8 @@ k () {
 
   # Stop stat failing when a directory contains either no files or no hidden files
   # Track if we _accidentally_ create a new global variable
-  setopt local_options null_glob typeset_silent no_auto_pushd
+  setopt local_options null_glob typeset_silent no_auto_pushd pushd_silent
+  unsetopt pushd_ignore_dups
 
   # Process options and get files/directories
   typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help
@@ -205,7 +206,7 @@ k () {
       show_list=($base_dir)
 
     #Directory, add its contents
-    elif cd -q $base_dir 2>/dev/null; then
+    elif pushd $base_dir 2>/dev/null; then
       # Set if we're in a repo or not
       typeset -i INSIDE_WORK_TREE=0
       if $(git rev-parse --is-inside-work-tree 2> /dev/null); then
@@ -239,7 +240,8 @@ k () {
         fi
       fi
     else
-      print -u2 "k: cannot access $base_dir: Permission denied"
+      print -u2 "k: permission denied: $base_dir"
+      continue
     fi
 
     # ----------------------------------------------------------------------------
@@ -424,7 +426,7 @@ k () {
       if [[ -n "$o_no_vcs" ]]; then
         STATUS='N'
       elif (( IS_DIRECTORY )); then
-        if cd -q $NAME 2>/dev/null; then
+        if pushd $NAME 2>/dev/null; then
           if $(git rev-parse --is-inside-work-tree 2>/dev/null); then
             # If we're not in a repo, still check each directory if it's a repo, and
             # then mark appropriately
@@ -433,9 +435,9 @@ k () {
               then STATUS='' # Show a green vertical bar for clean
               else STATUS='D' # Show a red vertical bar if dirty
               fi
-              cd -q - >/dev/null
+              popd >/dev/null
             else
-              cd -q - >/dev/null
+              popd >/dev/null
               # If the directory isn't ignored or clean, we'll just say it's dirty
               if git check-ignore --quiet ${NAME} 2>/dev/null; then STATUS='!!'
               elif git diff --stat --quiet --ignore-submodules ${NAME} 2> /dev/null; then STATUS=''
@@ -444,7 +446,7 @@ k () {
             fi
           else
             STATUS='N'
-            cd -q - >/dev/null
+            popd >/dev/null
           fi
         else
           STATUS='N'
@@ -502,7 +504,9 @@ k () {
 
       (( k++ )) # Bump loop index
     done
-    cd -q $origin_dir >/dev/null
+    if [[ ! -f $base_dir ]]; then
+      popd >/dev/null
+    fi
   done
 }
 
