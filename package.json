@@ -6,6 +6,7 @@
   },
   "devDependencies": {
     "ava": "0.15.2",
-    "execa": "0.4.0"
+    "execa": "0.4.0",
+    "strip-ansi": "3.0.1"
   }
 }
