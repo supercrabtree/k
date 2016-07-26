@@ -79,7 +79,7 @@ k () {
 
   # Setup array of directories to print
   typeset -a base_dirs
-  typeset origin_dir=$PWD
+  typeset base_dir
 
   if [[ -z "$@" ]]; then
     base_dirs=.
