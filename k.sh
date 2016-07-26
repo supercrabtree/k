@@ -8,7 +8,8 @@ k () {
 
   # Stop stat failing when a directory contains either no files or no hidden files
   # Track if we _accidentally_ create a new global variable
-  setopt local_options null_glob typeset_silent no_auto_pushd
+  setopt local_options null_glob typeset_silent no_auto_pushd pushd_silent
+  unsetopt pushd_ignore_dups
 
   # Process options and get files/directories
   typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help
@@ -39,7 +40,7 @@ k () {
   fi
 
   # Check for conflicts
-  if [[ "$o_directory" != "" && "$o_no_directory" != "" ]]; then
+  if [[ -n "$o_directory" && -n "$o_no_directory" ]]; then
     print -u2 "$o_directory and $o_no_directory cannot be used together"
     return 1
   fi
@@ -47,47 +48,41 @@ k () {
   # Check which numfmt available (if any), warn user if not available
   typeset -i numfmt_available=0
   typeset -i gnumfmt_available=0
-  if [[ "$o_human" != "" ]]; then
-    if [[ $+commands[numfmt] == 1 ]]; then
+  if [[ -n "$o_human" ]]; then
+    if (( $+commands[numfmt] )); then
       numfmt_available=1
-    elif [[ $+commands[gnumfmt] == 1 ]]; then
+    elif (( $+commands[gnumfmt] )); then
       gnumfmt_available=1
     else
       print -u2 "'numfmt' or 'gnumfmt' command not found, human readable output will not work."
       print -u2 "\tFalling back to normal file size output"
       # Set o_human to off
-      o_human=""
+      o_human=''
     fi
   fi
 
   # Create numfmt local function
   numfmt_local () {
-    if [[ "$o_si" != "" ]]; then
-      if (( $numfmt_available )); then
+    if [[ -n "$o_si" ]]; then
+      if (( numfmt_available )); then
         numfmt --to=si $1
-      elif (( $gnumfmt_available )); then
+      elif (( gnumfmt_available )); then
         gnumfmt --to=si $1
       fi
     else
-      if (( $numfmt_available )); then
+      if (( numfmt_available )); then
         numfmt --to=iec $1
-      elif (( $gnumfmt_available )); then
+      elif (( gnumfmt_available )); then
         gnumfmt --to=iec $1
       fi
     fi
   }
 
-  # Set if we're in a repo or not
-  typeset -i INSIDE_WORK_TREE=0
-  if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
-    INSIDE_WORK_TREE=1
-  fi
-
   # Setup array of directories to print
   typeset -a base_dirs
   typeset base_dir
 
-  if [[ "$@" == "" ]]; then
+  if [[ -z "$@" ]]; then
     base_dirs=.
   else
     base_dirs=($@)
@@ -138,7 +133,7 @@ k () {
     # ----------------------------------------------------------------------------
     # Display name if multiple paths were passed
     # ----------------------------------------------------------------------------
-    if [[ "$#base_dirs" > 1 ]]; then
+    if (( $#base_dirs > 1 )); then
       # Only add a newline if its not the first iteration
       if [[ "$base_dir" != "${base_dirs[1]}" ]]; then
         print
@@ -204,38 +199,49 @@ k () {
     # Check if it even exists
     if [[ ! -e $base_dir ]]; then
       print -u2 "k: cannot access $base_dir: No such file or directory"
+      continue
 
     # If its just a file, skip the directory handling
     elif [[ -f $base_dir ]]; then
       show_list=($base_dir)
 
     #Directory, add its contents
-    else
-      # Break total blocks of the front of the stat call, then push the rest to results
-      if [[ "$o_all" != "" && "$o_almost_all" == "" && "$o_no_directory" == "" ]]; then
-        show_list+=($base_dir/.)
-        show_list+=($base_dir/..)
+    elif pushd $base_dir 2>/dev/null; then
+      # Set if we're in a repo or not
+      typeset -i INSIDE_WORK_TREE=0
+      if $(git rev-parse --is-inside-work-tree 2> /dev/null); then
+        INSIDE_WORK_TREE=1
+        GIT_TOPLEVEL=$(git rev-parse --show-toplevel)
       fi
 
-      if [[ "$o_all" != "" || "$o_almost_all" != "" ]]; then
-        if [[ "$o_directory" != "" ]]; then
-          show_list+=($base_dir/*(D/))
-        elif [[ "$o_no_directory" != "" ]]; then
+      # Break total blocks of the front of the stat call, then push the rest to results
+      if [[ -n "$o_all" && -z "$o_almost_all" && -z "$o_no_directory" ]]; then
+        show_list+=(.)
+        show_list+=(..)
+      fi
+
+      if [[ -n "$o_all" || -n "$o_almost_all" ]]; then
+        if [[ -n "$o_directory" ]]; then
+          show_list+=(*(D/))
+        elif [[ -n "$o_no_directory" ]]; then
           #Use (^/) instead of (.) so sockets and symlinks get displayed
-          show_list+=($base_dir/*(D^/))
+          show_list+=(*(D^/))
         else
-          show_list+=($base_dir/*(D))
+          show_list+=(*(D))
         fi
       else
-        if [[ "$o_directory" != "" ]]; then
-          show_list+=($base_dir/*(/))
-        elif [[ "$o_no_directory" != "" ]]; then
+        if [[ -n "$o_directory" ]]; then
+          show_list+=(*(/))
+        elif [[ -n "$o_no_directory" ]]; then
           #Use (^/) instead of (.) so sockets and symlinks get displayed
-          show_list+=($base_dir/*(^/))
+          show_list+=(*(^/))
         else
-          show_list+=($base_dir/*)
+          show_list+=(*)
         fi
       fi
+    else
+      print -u2 "k: permission denied: $base_dir"
+      continue
     fi
 
     # ----------------------------------------------------------------------------
@@ -253,7 +259,7 @@ k () {
       typeset -A $statvar
       zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
       STATS_PARAMS_LIST+=($statvar)
-      i+=1
+      (( i++ ))
     done
 
 
@@ -266,7 +272,7 @@ k () {
       if [[ ${#sv[uid]}   -gt $MAX_LEN[3] ]]; then MAX_LEN[3]=${#sv[uid]}   ; fi
       if [[ ${#sv[gid]}   -gt $MAX_LEN[4] ]]; then MAX_LEN[4]=${#sv[gid]}   ; fi
 
-      if [[ "$o_human" != "" ]]; then
+      if [[ -n "$o_human" ]]; then
         h=$(numfmt_local ${sv[size]})
         if (( ${#h} > $MAX_LEN[5] )); then MAX_LEN[5]=${#h}; fi
       else
@@ -296,7 +302,7 @@ k () {
       sv=("${(@Pkv)statvar}")
 
       # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
-      REPOMARKER=" "
+      REPOMARKER=' '
       IS_DIRECTORY=0
       IS_SYMLINK=0
       IS_SOCKET=0
@@ -331,29 +337,8 @@ k () {
       if [[ -k "$NAME" ]]; then HAS_STICKY_BIT=1; fi
       if [[ $PERMISSIONS[9] == 'w' ]]; then IS_WRITABLE_BY_OTHERS=1; fi
 
-      # IS_GIT_REPO is a 1 if $NAME is a file/directory in a git repo, OR if $NAME is a git-repo itself
-      # GIT_TOPLEVEL is set to the directory containing the .git folder of a git-repo
-
-      # is this a git repo
-      if [[ "$o_no_vcs" != "" ]]; then
-        IS_GIT_REPO=0
-        GIT_TOPLEVEL=''
-      else
-        if (( IS_DIRECTORY ));
-          then builtin cd -q $NAME     2>/dev/null || builtin cd -q - >/dev/null && IS_GIT_REPO=0 #Say no if we don't have permissions there
-          else builtin cd -q $NAME:a:h 2>/dev/null || builtin cd -q - >/dev/null && IS_GIT_REPO=0
-        fi
-        if [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]]; then
-          IS_GIT_REPO=1
-          GIT_TOPLEVEL=$(command git rev-parse --show-toplevel)
-        else
-          IS_GIT_REPO=0
-        fi
-        builtin cd -q - >/dev/null
-      fi
-
       # Get human readable output if necessary
-      if [[ "$o_human" != "" ]]; then
+      if [[ -n "$o_human" ]]; then
         # I hate making this call twice, but its either that, or do a bunch
         # of calculations much earlier.
         FILESIZE_OUT=$(numfmt_local $FILESIZE)
@@ -435,39 +420,52 @@ k () {
       # --------------------------------------------------------------------------
       # Colour the repomarker
       # --------------------------------------------------------------------------
-      if [[ "$o_no_vcs" != "" ]]; then
-        REPOMARKER=""
-      elif (( IS_GIT_REPO != 0)); then
-        # If we're not in a repo, still check each directory if it's a repo, and
-        # then mark appropriately
-        if (( INSIDE_WORK_TREE == 0 )); then
-          if (( IS_DIRECTORY )); then
-            if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --stat --quiet --ignore-submodules HEAD &>/dev/null # if dirty
-              then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
-              else REPOMARKER=$'\e[0;31m+\e[0m' # Show a red vertical bar if dirty
-            fi
-          fi
-        else
-          if (( IS_DIRECTORY )); then
-            # If the directory isn't ignored or clean, we'll just say it's dirty
-            if command git check-ignore --quiet ${NAME} 2>/dev/null; then STATUS='!!'
-            elif command git diff --stat --quiet --ignore-submodules ${NAME} 2> /dev/null; then STATUS='';
-            else STATUS=' M'
+      # GIT_TOPLEVEL is set to the directory containing the .git folder of a git-repo
+
+      # is this a git repo
+      if [[ -n "$o_no_vcs" ]]; then
+        STATUS='N'
+      elif (( IS_DIRECTORY )); then
+        if pushd $NAME 2>/dev/null; then
+          if $(git rev-parse --is-inside-work-tree 2>/dev/null); then
+            # If we're not in a repo, still check each directory if it's a repo, and
+            # then mark appropriately
+            if (( INSIDE_WORK_TREE == 0 )); then
+              if git diff --stat --quiet --ignore-submodules HEAD &>/dev/null # if dirty
+              then STATUS='' # Show a green vertical bar for clean
+              else STATUS='D' # Show a red vertical bar if dirty
+              fi
+              popd >/dev/null
+            else
+              popd >/dev/null
+              # If the directory isn't ignored or clean, we'll just say it's dirty
+              if git check-ignore --quiet ${NAME} 2>/dev/null; then STATUS='!!'
+              elif git diff --stat --quiet --ignore-submodules ${NAME} 2> /dev/null; then STATUS=''
+              else STATUS='D'
+              fi
             fi
           else
-            # File
-            STATUS=$(command git status --porcelain --ignored --untracked-files=normal $GIT_TOPLEVEL/${${${NAME:a}##$GIT_TOPLEVEL}#*/})
+            STATUS='N'
+            popd >/dev/null
           fi
-          STATUS=${STATUS[1,2]}
-            if [[ $STATUS == ' M' ]]; then REPOMARKER=$'\e[0;31m+\e[0m';     # Tracked & Dirty
-          elif [[ $STATUS == 'M ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Tracked & Dirty & Added
-          elif [[ $STATUS == '??' ]]; then REPOMARKER=$'\e[38;5;214m+\e[0m'; # Untracked
-          elif [[ $STATUS == '!!' ]]; then REPOMARKER=$'\e[38;5;238m|\e[0m'; # Ignored
-          elif [[ $STATUS == 'A ' ]]; then REPOMARKER=$'\e[38;5;082m+\e[0m'; # Added
-          else                             REPOMARKER=$'\e[38;5;082m|\e[0m'; # Good
-          fi
+        else
+          STATUS='N'
         fi
+      elif (( INSIDE_WORK_TREE )); then
+        # File
+        STATUS=${$(git status --porcelain --ignored --untracked-files=normal $GIT_TOPLEVEL/${${${NAME:a}##$GIT_TOPLEVEL}#*/})[1]}
+      else
+        STATUS='N'
       fi
+      case "$STATUS" in
+          (D)    REPOMARKER=$'\e[0;31m+\e[0m';;     # Tracked & Dirty
+          (M)    REPOMARKER=$'\e[38;5;082m+\e[0m';; # Tracked & Dirty & Added
+          (\?\?) REPOMARKER=$'\e[38;5;214m+\e[0m';; # Untracked
+          (!!)   REPOMARKER=$'\e[38;5;238m|\e[0m';; # Ignored
+          (A)    REPOMARKER=$'\e[38;5;082m+\e[0m';; # Added
+          (N)    REPOMARKER=' ';;                   # Not a repo
+          (*)    REPOMARKER=$'\e[38;5;082m|\e[0m';; # Clean
+      esac
 
       # --------------------------------------------------------------------------
       # Colour the filename
@@ -476,22 +474,22 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-      if [[ $IS_DIRECTORY == 1 ]]; then
-        if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
-          if [[ $HAS_STICKY_BIT == 1 ]]; then
-            NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
+      if (( $IS_DIRECTORY == 1 )); then
+        if (( $IS_WRITABLE_BY_OTHERS == 1 )); then
+          if (( $HAS_STICKY_BIT == 1 )); then
+            NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m'
           fi
-          NAME=$'\e['"$K_COLOR_OW"'m'"$NAME"$'\e[0m';
+          NAME=$'\e['"$K_COLOR_OW"'m'"$NAME"$'\e[0m'
         fi
-        NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_SYMLINK           == 1 ]]; then NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_SOCKET            == 1 ]]; then NAME=$'\e['"$K_COLOR_SO"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_PIPE              == 1 ]]; then NAME=$'\e['"$K_COLOR_PI"'m'"$NAME"$'\e[0m';
-      elif [[ $HAS_UID_BIT          == 1 ]]; then NAME=$'\e['"$K_COLOR_SU"'m'"$NAME"$'\e[0m';
-      elif [[ $HAS_GID_BIT          == 1 ]]; then NAME=$'\e['"$K_COLOR_SG"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_EXECUTABLE        == 1 ]]; then NAME=$'\e['"$K_COLOR_EX"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_BLOCK_SPECIAL     == 1 ]]; then NAME=$'\e['"$K_COLOR_BD"'m'"$NAME"$'\e[0m';
-      elif [[ $IS_CHARACTER_SPECIAL == 1 ]]; then NAME=$'\e['"$K_COLOR_CD"'m'"$NAME"$'\e[0m';
+        NAME=$'\e['"$K_COLOR_DI"'m'"$NAME"$'\e[0m'
+      elif (( $IS_SYMLINK           == 1 )); then NAME=$'\e['"$K_COLOR_LN"'m'"$NAME"$'\e[0m'
+      elif (( $IS_SOCKET            == 1 )); then NAME=$'\e['"$K_COLOR_SO"'m'"$NAME"$'\e[0m'
+      elif (( $IS_PIPE              == 1 )); then NAME=$'\e['"$K_COLOR_PI"'m'"$NAME"$'\e[0m'
+      elif (( $HAS_UID_BIT          == 1 )); then NAME=$'\e['"$K_COLOR_SU"'m'"$NAME"$'\e[0m'
+      elif (( $HAS_GID_BIT          == 1 )); then NAME=$'\e['"$K_COLOR_SG"'m'"$NAME"$'\e[0m'
+      elif (( $IS_EXECUTABLE        == 1 )); then NAME=$'\e['"$K_COLOR_EX"'m'"$NAME"$'\e[0m'
+      elif (( $IS_BLOCK_SPECIAL     == 1 )); then NAME=$'\e['"$K_COLOR_BD"'m'"$NAME"$'\e[0m'
+      elif (( $IS_CHARACTER_SPECIAL == 1 )); then NAME=$'\e['"$K_COLOR_CD"'m'"$NAME"$'\e[0m'
       fi
 
       # --------------------------------------------------------------------------
@@ -504,8 +502,11 @@ k () {
       # --------------------------------------------------------------------------
       print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
 
-      k=$((k+1)) # Bump loop index
+      (( k++ )) # Bump loop index
     done
+    if [[ ! -f $base_dir ]]; then
+      popd >/dev/null
+    fi
   done
 }
 
