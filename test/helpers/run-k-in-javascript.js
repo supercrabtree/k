@@ -1,3 +1,5 @@
+'use strict';
+
 const execa = require('execa');
 const {readFileSync} = require('fs');
 const stripAnsi = require('strip-ansi');
