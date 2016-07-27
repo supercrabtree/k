@@ -1,8 +1,8 @@
 import test from 'ava';
-import {default as k, split} from './helpers/run-k-in-javascript';
+import {default as k, split, stripColors} from './helpers/run-k-in-javascript';
 
 test('File and directory types', async t => {
-  const lines = await k.stripColors('fixtures/one').then(split);
+  const lines = await k('fixtures/one').then(stripColors).then(split);
   t.is(lines[0],  'total 16');
   t.is(lines[1],  '-rwxr-sr-x 1 supercrabtree staff  0 10 Feb   20:19 | exe-with-gid');
   t.is(lines[2],  '-rwsr-sr-x 1 supercrabtree staff  0 10 Feb   20:42 | exe-with-gid-and-uid');

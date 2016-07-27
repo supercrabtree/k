@@ -15,12 +15,11 @@ function k() {
   return execa('eval', args, {shell: '/bin/zsh'}).then(({stdout}) => stdout);
 }
 
-k.stripColors = function () {
-  return k.apply(undefined, arguments)
-    .then(stdout => stripAnsi(stdout));
+k.stripColors = function (stdout) {
+  return stripAnsi(stdout);
 }
 
-k.split = function splitToArray(stdout) {
+k.split = function (stdout) {
   return stdout.split(/\s?\n/);
 }
 
