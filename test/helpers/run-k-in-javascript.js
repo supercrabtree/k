@@ -15,12 +15,8 @@ function k() {
   return execa('eval', args, {shell: '/bin/zsh'}).then(({stdout}) => stdout);
 }
 
-k.stripColors = function (stdout) {
-  return stripAnsi(stdout);
-}
+k.stripColors = str => stripAnsi(str);
 
-k.split = function (stdout) {
-  return stdout.split(/\s?\n/);
-}
+k.split = str => str.split(/\s?\n/);
 
 module.exports = k;
