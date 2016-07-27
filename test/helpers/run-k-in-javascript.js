@@ -12,7 +12,7 @@ function k() {
     args.push(arguments[i]);
   }
 
-  return execa('eval', args, {shell: '/bin/zsh'}).then(({stdout}) => stdout);
+  return execa('eval', args, {shell: '/bin/zsh'}).then(({stdout}) => stdout.trim());
 }
 
 k.stripColors = str => stripAnsi(str);

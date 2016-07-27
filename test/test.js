@@ -13,5 +13,5 @@ test('File and directory types', async t => {
   t.is(lines[7],  'drwxr-xr-x 2 supercrabtree staff 68 24 Jan    2016 | nested-dir');
   t.is(lines[8],  '-rw-r--r-- 1 supercrabtree staff 12 24 Jan    2016 | string.txt');
   t.is(lines[9],  'drwxrwxrwt 2 supercrabtree staff 68 10 Feb   20:50 | wto-with-sticky');
-  t.is(lines[10], 'drwxrwxrwx 2 supercrabtree staff 68 10 Feb   20:50 | wto-without-sticky ');
+  t.is(lines[10], 'drwxrwxrwx 2 supercrabtree staff 68 10 Feb   20:50 | wto-without-sticky');
 });
