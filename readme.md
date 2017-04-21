@@ -64,7 +64,7 @@ antigen apply
 Clone k into your custom plugins repo
 
 ```shell
-git clone https://github.com/supercrabtree/k $HOME/.oh-my-zsh/custom/plugins/k
+git clone https://github.com/supercrabtree/k $ZSH_CUSTOM/plugins/k
 ```
 Then load as a plugin in your `.zshrc`
 
