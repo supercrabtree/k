@@ -108,6 +108,7 @@ k () {
   K_COLOR_SG="30;46" # sg:executable with setgid bit set
   K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
   K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
+  K_COLOR_BR="0;34" # branch
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
@@ -284,6 +285,7 @@ k () {
     # ----------------------------------------------------------------------------
 
     typeset REPOMARKER
+    typeset REPOBRANCH
     typeset PERMISSIONS HARDLINKCOUNT OWNER GROUP FILESIZE FILESIZE_OUT DATE NAME SYMLINK_TARGET
     typeset FILETYPE PER1 PER2 PER3 PERMISSIONS_OUTPUT STATUS
     typeset TIME_DIFF TIME_COLOR DATE_OUTPUT
@@ -441,6 +443,7 @@ k () {
         # If we're not in a repo, still check each directory if it's a repo, and
         # then mark appropriately
         if (( INSIDE_WORK_TREE == 0 )); then
+          REPOBRANCH=$(command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" rev-parse --abbrev-ref HEAD 2>/dev/null)
           if (( IS_DIRECTORY )); then
             if command git --git-dir="$GIT_TOPLEVEL/.git" --work-tree="${NAME}" diff --stat --quiet --ignore-submodules HEAD &>/dev/null # if dirty
               then REPOMARKER=$'\e[38;5;46m|\e[0m' # Show a green vertical bar for clean
@@ -495,6 +498,11 @@ k () {
       fi
 
       # --------------------------------------------------------------------------
+      # Colour branch
+      # --------------------------------------------------------------------------
+      REPOBRANCH=$'\e['"$K_COLOR_BR"'m'"$REPOBRANCH"$'\e[0m';
+
+      # --------------------------------------------------------------------------
       # Format symlink target
       # --------------------------------------------------------------------------
       if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> ${SYMLINK_TARGET//$'\e'/\\e}"; fi
@@ -502,7 +510,7 @@ k () {
       # --------------------------------------------------------------------------
       # Display final result
       # --------------------------------------------------------------------------
-      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET"
+      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET $REPOBRANCH"
 
       k=$((k+1)) # Bump loop index
     done
