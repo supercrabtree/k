@@ -505,12 +505,12 @@ k () {
       # --------------------------------------------------------------------------
       # Format symlink target
       # --------------------------------------------------------------------------
-      if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET="-> ${SYMLINK_TARGET//$'\e'/\\e}"; fi
+      if [[ $SYMLINK_TARGET != "" ]]; then SYMLINK_TARGET=" -> ${SYMLINK_TARGET//$'\e'/\\e}"; fi
 
       # --------------------------------------------------------------------------
       # Display final result
       # --------------------------------------------------------------------------
-      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME $SYMLINK_TARGET $REPOBRANCH"
+      print -r -- "$PERMISSIONS_OUTPUT $HARDLINKCOUNT $OWNER $GROUP $FILESIZE_OUT $DATE_OUTPUT $REPOMARKER $NAME$SYMLINK_TARGET $REPOBRANCH"
 
       k=$((k+1)) # Bump loop index
     done
