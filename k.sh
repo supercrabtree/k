@@ -299,6 +299,7 @@ k () {
 
       # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
       REPOMARKER=" "
+      REPOBRANCH=""
       IS_DIRECTORY=0
       IS_SYMLINK=0
       IS_SOCKET=0
