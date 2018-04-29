@@ -108,7 +108,7 @@ k () {
   K_COLOR_SG="30;46" # sg:executable with setgid bit set
   K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
   K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
-  K_COLOR_BR="0;34" # branch
+  K_COLOR_BR="0;30"  # branch
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
@@ -299,6 +299,7 @@ k () {
 
       # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
       REPOMARKER=" "
+      REPOBRANCH=""
       IS_DIRECTORY=0
       IS_SYMLINK=0
       IS_SOCKET=0
