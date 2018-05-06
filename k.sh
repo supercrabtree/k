@@ -8,7 +8,7 @@ k () {
 
   # Stop stat failing when a directory contains either no files or no hidden files
   # Track if we _accidentally_ create a new global variable
-  setopt local_options null_glob typeset_silent no_auto_pushd
+  setopt local_options null_glob typeset_silent no_auto_pushd nomarkdirs
 
   # Process options and get files/directories
   typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_help
