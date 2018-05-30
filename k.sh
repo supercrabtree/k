@@ -97,18 +97,18 @@ k () {
   # Colors
   # ----------------------------------------------------------------------------
   # default colors
-  K_COLOR_DI="0;34"  # di:directory
-  K_COLOR_LN="0;35"  # ln:symlink
-  K_COLOR_SO="0;32"  # so:socket
-  K_COLOR_PI="0;33"  # pi:pipe
-  K_COLOR_EX="0;31"  # ex:executable
-  K_COLOR_BD="34;46" # bd:block special
-  K_COLOR_CD="34;43" # cd:character special
-  K_COLOR_SU="30;41" # su:executable with setuid bit set
-  K_COLOR_SG="30;46" # sg:executable with setgid bit set
-  K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
-  K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
-  K_COLOR_BR="0;30"  # branch
+  K_COLOR_DI=${K_CUSTOM_COLOR_DI:-"0;34"}  # di:directory
+  K_COLOR_LN=${K_CUSTOM_COLOR_LN:-"0;35"}  # ln:symlink
+  K_COLOR_SO=${K_CUSTOM_COLOR_SO:-"0;32"}  # so:socket
+  K_COLOR_PI=${K_CUSTOM_COLOR_PI:-"0;33"}  # pi:pipe
+  K_COLOR_EX=${K_CUSTOM_COLOR_EX:-"0;31"}  # ex:executable
+  K_COLOR_BD=${K_CUSTOM_COLOR_BD:-"34;46"} # bd:block special
+  K_COLOR_CD=${K_CUSTOM_COLOR_CD:-"34;43"} # cd:character special
+  K_COLOR_SU=${K_CUSTOM_COLOR_SU:-"30;41"} # su:executable with setuid bit set
+  K_COLOR_SG=${K_CUSTOM_COLOR_SG:-"30;46"} # sg:executable with setgid bit set
+  K_COLOR_TW=${K_CUSTOM_COLOR_TW:-"30;42"} # tw:directory writable to others, with sticky bit
+  K_COLOR_OW=${K_CUSTOM_COLOR_OW:-"30;43"} # ow:directory writable to others, without sticky bit
+  K_COLOR_BR=${K_CUSTOM_COLOR_BR:-"0;30"}  # branch
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
@@ -395,8 +395,11 @@ k () {
       # --------------------------------------------------------------------------
       # Colour Owner and Group
       # --------------------------------------------------------------------------
-      OWNER=$'\e[38;5;241m'"$OWNER"$'\e[0m'
-      GROUP=$'\e[38;5;241m'"$GROUP"$'\e[0m'
+      local owner_color=${K_CUSTOM_OWNER_COLOR:-241}
+      local group_color=${K_CUSTOM_GROUP_COLOR:-241}
+
+      OWNER=$'\e[38;5;'"$owner_color"$'m'"$OWNER"$'\e[0m'
+      GROUP=$'\e[38;5;'"$group_color"$'m'"$GROUP"$'\e[0m'
 
       # --------------------------------------------------------------------------
       # Colour file weights
