@@ -11,12 +11,14 @@ k () {
   setopt local_options null_glob typeset_silent no_auto_pushd nomarkdirs
 
   # Process options and get files/directories
-  typeset -a o_all o_almost_all o_human o_si o_directory o_no_directory o_no_vcs o_sort o_sort_reverse o_help
+  typeset -a o_all o_almost_all o_human o_si o_directory o_group_directories \
+	  o_no_directory o_no_vcs o_sort o_sort_reverse o_help
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
              c=o_sort \
              d=o_directory -directory=o_directory \
+	     -group-directories-first=o_group_directories \
              h=o_human -human=o_human \
              -si=o_si \
              n=o_no_directory -no-directory=o_no_directory \
@@ -79,6 +81,9 @@ k () {
     typeset SORT_GLOB="${S_ORD}${SPEC}"
   else
     typeset SORT_GLOB="${R_ORD}${SPEC}"
+  fi
+  if [[ "$o_group_directories" != "" ]]; then
+    SORT_GLOB="oe:[[ -d \$REPLY ]];REPLY=\$?:$SORT_GLOB"
   fi
 
   # Check which numfmt available (if any), warn user if not available
