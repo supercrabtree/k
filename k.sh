@@ -168,11 +168,6 @@ k () {
     K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[21] $LSCOLORS[22])
   fi
 
-  # read colors if linux and $LS_COLORS is defined
-  # if [[ $(uname) == 'Linux' && -n $LS_COLORS ]]; then
-
-  # fi
-
   # ----------------------------------------------------------------------------
   # Loop over passed directories and files to display
   # ----------------------------------------------------------------------------
@@ -522,7 +517,12 @@ k () {
       # But we don't want to quote '.'; so instead we escape the escape manually and use q-
       NAME="${${NAME##*/}//$'\e'/\\e}"    # also propagate changes to SYMLINK_TARGET below
 
-      if [[ $IS_DIRECTORY == 1 ]]; then
+      if [[ "$LS_COLORS" ]] && ls --color -d . &>/dev/null; then
+        # We are using an ls that supports using colors from $LS_COLORS (probably GNU ls here)
+        pushd "${base_dir}" &>/dev/null
+        NAME="$(ls --color=always -d "$NAME")"
+        popd &>/dev/null
+      elif [[ $IS_DIRECTORY == 1 ]]; then
         if [[ $IS_WRITABLE_BY_OTHERS == 1 ]]; then
           if [[ $HAS_STICKY_BIT == 1 ]]; then
             NAME=$'\e['"$K_COLOR_TW"'m'"$NAME"$'\e[0m';
