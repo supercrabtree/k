@@ -72,6 +72,29 @@ Then load as a plugin in your `.zshrc`
 plugins+=(k)
 ```
 
+### As a [Prezto](https://github.com/sorin-ionescu/prezto) custom module
+
+Make sure your contrib directory is defined in `$HOME/.zpreztorc`:
+
+```shell
+zstyle ':prezto:load' pmodule-dirs $HOME/.zprezto-contrib
+```
+
+Clone k into your contrib directory
+
+```shell
+git clone https://github.com/supercrabtree/k $HOME/.zprezto-contrib/k
+```
+
+Enable the module in `$HOME/.zpreztorc`:
+
+```shell
+zstyle ':prezto:load' pmodule \
+  'environment' \
+  ...
+  'k'
+```
+
 ### Manually
 Clone this repository somewhere (~/k for example)
 
