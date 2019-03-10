@@ -8,7 +8,7 @@ k () {
 
   # Stop stat failing when a directory contains either no files or no hidden files
   # Track if we _accidentally_ create a new global variable
-  setopt local_options null_glob typeset_silent no_auto_pushd nomarkdirs
+  setopt local_options null_glob typeset_silent no_auto_pushd nomarkdirs extendedglob
 
   # Process options and get files/directories
   typeset -a o_all o_almost_all o_human o_si o_directory o_group_directories \
@@ -287,14 +287,15 @@ k () {
     typeset -i i=1 j=1 k=1
     typeset -a STATS_PARAMS_LIST
     typeset fn statvar h
-    typeset -A sv
+    typeset -A nsv sv
 
     STATS_PARAMS_LIST=()
     for fn in $show_list
     do
       statvar="stats_$i"
       typeset -A $statvar
-      zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
+      zstat -H $statvar -Ln -F "%s^%d^%b^%H:%M^%Y" -- "$fn"      # use lstat, render mode/uid/gid to strings
+      zstat -H "n$statvar" -Ln -- "$fn"  # use numeric versions of mode/uid/gid
       STATS_PARAMS_LIST+=($statvar)
       i+=1
     done
@@ -337,7 +338,9 @@ k () {
     k=1
     for statvar in "${STATS_PARAMS_LIST[@]}"
     do
+      nstatvar="n$statvar"
       sv=("${(@Pkv)statvar}")
+      nsv=("${(@Pkv)nstatvar}")
 
       # We check if the result is a git repo later, so set a blank marker indication the result is not a git repo
       REPOMARKER=" "
@@ -414,31 +417,70 @@ k () {
        FILESIZE_OUT="${(l:MAX_LEN[5]:)FILESIZE_OUT}"
 
       # --------------------------------------------------------------------------
-      # Colour the permissions - TODO
+      # Colour the permissions
       # --------------------------------------------------------------------------
-      # Colour the first character based on filetype
-      FILETYPE="${PERMISSIONS[1]}"
+      if (( IS_SYMLINK )); then
+        PERMISSIONS_OUTPUT=$'\e[38;5;'"$K_COLOR_LN"'m'"$PERMISSIONS"$'\e[0m'
+      else
+        case $K_PERM_COLOR in
+          abs*)
+            local color
+            # Colour the first character based on filetype
+            FILETYPE="${PERMISSIONS[1]}"
 
-      # Permissions Owner
-      PER1="${PERMISSIONS[2,4]}"
+            local reset=$'\e[0m'
+            # Permissions User
+            color=$'\e[38;5;2m'
+            PER1="${PERMISSIONS[2,4]//(#m)[^\-]/$color$MATCH$reset}"
 
-      # Permissions Group
-      PER2="${PERMISSIONS[5,7]}"
+            # Permissions Group
+            color=$'\e[38;5;3m'
+            PER2="${PERMISSIONS[5,7]//(#m)[^\-]/$color$MATCH$reset}"
 
-      # Permissions User
-      PER3="${PERMISSIONS[8,10]}"
+            # Permissions Other
+            color=$'\e[38;5;1m'
+            PER3="${PERMISSIONS[8,10]//(#m)[^\-]/${color}$MATCH$reset}"
 
-      PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
+            PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
+          ;;
+          rel*)
+            # relative: fade unless user matches
+            local color=$'\e[38;5;8m'
+            local reset=$'\e[0m'
+            # Colour the first character based on filetype
+            FILETYPE="${PERMISSIONS[1]}"
 
-      # --------------------------------------------------------------------------
-      # Colour the symlinks
-      # --------------------------------------------------------------------------
+            # Permissions User
+            if (( UID == nsv[uid] )); then
+              PER1="${PERMISSIONS[2,4]}"
+              PER1="${PERMISSIONS[2,4]//(#m)[\-]/$color$MATCH$reset}"
+            else
+              PER1="$color${PERMISSIONS[2,4]}$reset"
+            fi
+
+            # Permissions Group
+            if (( usergroups[(r)${nsv[gid]}] )); then
+              PER2="${PERMISSIONS[5,7]}"
+              PER2="${PERMISSIONS[5,7]//(#m)[\-]/$color$MATCH$reset}"
+            else
+              PER2="$color${PERMISSIONS[5,7]}$reset"
+            fi
+
+            # Permissions Other
+            PER3="${PERMISSIONS[8,10]//(#m)[\-]/$color$MATCH$reset}"
+
+            PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
+          ;;
+          *) PERMISSIONS_OUTPUT="$PERMISSIONS"
+        esac
+
+      fi
 
       # --------------------------------------------------------------------------
       # Colour Owner and Group
       # --------------------------------------------------------------------------
-      OWNER=$'\e[38;5;241m'"$OWNER"$'\e[0m'
-      GROUP=$'\e[38;5;241m'"$GROUP"$'\e[0m'
+      (( UID == nsv[uid] )) || OWNER=$'\e[38;5;241m'"$OWNER"$'\e[0m'
+      (( usergroups[(r)${nsv[gid]}] )) || GROUP=$'\e[38;5;241m'"$GROUP"$'\e[0m'
 
       # --------------------------------------------------------------------------
       # Colour file weights
