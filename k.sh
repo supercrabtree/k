@@ -453,7 +453,6 @@ k () {
             # Permissions User
             if (( UID == nsv[uid] )); then
               PER1="${PERMISSIONS[2,4]}"
-              PER1="${PERMISSIONS[2,4]//(#m)[\-]/$color$MATCH$reset}"
             else
               PER1="$color${PERMISSIONS[2,4]}$reset"
             fi
@@ -461,13 +460,11 @@ k () {
             # Permissions Group
             if (( usergroups[(r)${nsv[gid]}] )); then
               PER2="${PERMISSIONS[5,7]}"
-              PER2="${PERMISSIONS[5,7]//(#m)[\-]/$color$MATCH$reset}"
             else
               PER2="$color${PERMISSIONS[5,7]}$reset"
             fi
-
             # Permissions Other
-            PER3="${PERMISSIONS[8,10]//(#m)[\-]/$color$MATCH$reset}"
+            PER3="${PERMISSIONS[8,10]}"
 
             PERMISSIONS_OUTPUT="$FILETYPE$PER1$PER2$PER3"
           ;;
