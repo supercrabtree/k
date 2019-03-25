@@ -286,15 +286,20 @@ k () {
     # ----------------------------------------------------------------------------
     typeset -i i=1 j=1 k=1
     typeset -a STATS_PARAMS_LIST
-    typeset fn statvar h
+    typeset fn statvar h datefmt
     typeset -A sv
 
     STATS_PARAMS_LIST=()
+    if [[ $K_ISO8601 ]]; then
+      datefmt="%F^%H:%M"
+    else
+      datefmt="%d^%b^%H:%M^%Y"
+    fi
     for fn in $show_list
     do
       statvar="stats_$i"
       typeset -A $statvar
-      zstat -H $statvar -Lsn -F "%s^%d^%b^%H:%M^%Y" -- "$fn"  # use lstat, render mode/uid/gid to strings
+      zstat -H $statvar -Lsn -F "%s^$datefmt" -- "$fn"  # use lstat, render mode/uid/gid to strings
       STATS_PARAMS_LIST+=($statvar)
       i+=1
     done
@@ -466,13 +471,17 @@ k () {
         break
       done
 
-      # Format date to show year if more than 6 months since last modified
-      if (( TIME_DIFF < 15724800 )); then
-        DATE_OUTPUT="${DATE[2]} ${(r:5:: :)${DATE[3][0,5]}} ${DATE[4]}"
+      if [[ -z $K_ISO8601 ]]; then
+        # Format date to show year if more than 6 months since last modified
+        if (( TIME_DIFF < 15724800 )); then
+          DATE_OUTPUT="${DATE[2]} ${(r:5:: :)${DATE[3][0,5]}} ${DATE[4]}"
+        else
+          DATE_OUTPUT="${DATE[2]} ${(r:6:: :)${DATE[3][0,5]}} ${DATE[5]}"  # extra space; 4 digit year instead of 5 digit HH:MM
+        fi;
+        DATE_OUTPUT[1]="${DATE_OUTPUT[1]//0/ }" # If day of month begins with zero, replace zero with space
       else
-        DATE_OUTPUT="${DATE[2]} ${(r:6:: :)${DATE[3][0,5]}} ${DATE[5]}"  # extra space; 4 digit year instead of 5 digit HH:MM
-      fi;
-      DATE_OUTPUT[1]="${DATE_OUTPUT[1]//0/ }" # If day of month begins with zero, replace zero with space
+        DATE_OUTPUT="${DATE[2]} ${DATE[3]}"
+      fi
 
       # Apply colour to formated date
       DATE_OUTPUT=$'\e[38;5;'"${TIME_COLOR}m${DATE_OUTPUT}"$'\e[0m'
