@@ -210,32 +210,42 @@ k () {
     typeset GIT_TOPLEVEL
 
     typeset -i LARGE_FILE_COLOR=196
-    typeset -a SIZELIMITS_TO_COLOR
-    SIZELIMITS_TO_COLOR=(
+    if [[ ${+K_SIZELIMITS_TO_COLOR} ]]; then
+      SIZELIMITS_TO_COLOR=("${K_SIZELIMITS_TO_COLOR[@]}")
+    else
+      typeset -a SIZELIMITS_TO_COLOR
+      SIZELIMITS_TO_COLOR=(
         1024  46    # <= 1kb
         2048  82    # <= 2kb
         3072  118   # <= 3kb
         5120  154   # <= 5kb
-       10240  190   # <= 10kb
-       20480  226   # <= 20kb
-       40960  220   # <= 40kb
-      102400  214   # <= 100kb
-      262144  208   # <= 0.25mb || 256kb
-      524288  202   # <= 0.5mb || 512kb
+        10240  190   # <= 10kb
+        20480  226   # <= 20kb
+        40960  220   # <= 40kb
+        102400  214   # <= 100kb
+        262144  208   # <= 0.25mb || 256kb
+        524288  202   # <= 0.5mb || 512kb
       )
+    fi
+
     typeset -i ANCIENT_TIME_COLOR=236  # > more than 2 years old
-    typeset -a FILEAGES_TO_COLOR
-    FILEAGES_TO_COLOR=(
-             0 196  # < in the future, #spooky
-            60 255  # < less than a min old
-          3600 252  # < less than an hour old
-         86400 250  # < less than 1 day old
+    if [[ ${+K_FILEAGES_TO_COLOR} ]]; then
+      echo "son qui"
+      FILEAGES_TO_COLOR=("${K_FILEAGES_TO_COLOR[@]}")
+    else
+      typeset -a FILEAGES_TO_COLOR
+      FILEAGES_TO_COLOR=(
+        0 196  # < in the future, #spooky
+        60 255  # < less than a min old
+        3600 252  # < less than an hour old
+        86400 250  # < less than 1 day old
         604800 244  # < less than 1 week old
-       2419200 244  # < less than 28 days (4 weeks) old
-      15724800 242  # < less than 26 weeks (6 months) old
-      31449600 240  # < less than 1 year old
-      62899200 238  # < less than 2 years old
+        2419200 244  # < less than 28 days (4 weeks) old
+        15724800 242  # < less than 26 weeks (6 months) old
+        31449600 240  # < less than 1 year old
+        62899200 238  # < less than 2 years old
       )
+    fi
 
     # ----------------------------------------------------------------------------
     # Build up list of files/directories to show

@@ -97,6 +97,25 @@ k
 ```
 # 😮
 
+## Change colors for file size and file date
+Use the `K_SIZELIMITS_TO_COLOR` and `K_FILEAGES_TO_COLOR` env variables
+``` sh
+#solarized theme
+export K_SIZELIMITS_TO_COLOR=(
+	 10240  64
+    102400  136
+	262144  166
+	524288  160
+)
+
+export K_FILEAGES_TO_COLOR=(
+	3600 244
+	86400 245
+	15724800 241
+	31449600 240
+)
+```
+
 ## Minimum Requirements
 zsh 4.3.11  
 Git 1.7.2
@@ -114,6 +133,7 @@ Git 1.7.2
 [srijanshetty](https://github.com/srijanshetty)  
 [zblach](https://github.com/zblach)  
 [mattboll](https://github.com/mattboll)  
+[glsorre](https://github.com/glsorre)
 Pull requests welcome :smile:  
 
 ## Thanks
