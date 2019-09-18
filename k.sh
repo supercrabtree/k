@@ -230,7 +230,6 @@ k () {
 
     typeset -i ANCIENT_TIME_COLOR=236  # > more than 2 years old
     if [[ ${+K_FILEAGES_TO_COLOR} ]]; then
-      echo "son qui"
       FILEAGES_TO_COLOR=("${K_FILEAGES_TO_COLOR[@]}")
     else
       typeset -a FILEAGES_TO_COLOR
