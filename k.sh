@@ -12,13 +12,13 @@ k () {
 
   # Process options and get files/directories
   typeset -a o_all o_almost_all o_human o_si o_directory o_group_directories \
-	  o_no_directory o_no_vcs o_sort o_sort_reverse o_help
+          o_no_directory o_no_vcs o_sort o_sort_reverse o_help
   zparseopts -E -D \
              a=o_all -all=o_all \
              A=o_almost_all -almost-all=o_almost_all \
              c=o_sort \
              d=o_directory -directory=o_directory \
-	     -group-directories-first=o_group_directories \
+             -group-directories-first=o_group_directories \
              h=o_human -human=o_human \
              -si=o_si \
              n=o_no_directory -no-directory=o_no_directory \
@@ -50,7 +50,7 @@ k () {
     print -u2 "\t-U                      Unsorted"
     print -u2 "\t        --sort WORD     sort by WORD: none (U), size (S),"
     print -u2 "\t                        time (t), ctime or status (c),"
-    print -u2 "\t       		 atime or access or use (u)"
+    print -u2 "\t                        atime or access or use (u)"
     print -u2 "\t        --no-vcs        do not get VCS status (much faster)"
     print -u2 "\t        --help          show this help"
     return 1
@@ -276,7 +276,7 @@ k () {
           #Use (^/) instead of (.) so sockets and symlinks get displayed
           show_list+=($base_dir/*(^/$SORT_GLOB))
         else
-	  show_list+=($base_dir/*($SORT_GLOB))
+          show_list+=($base_dir/*($SORT_GLOB))
         fi
       fi
     fi
