@@ -139,33 +139,33 @@ k () {
   # Colors
   # ----------------------------------------------------------------------------
   # default colors
-  K_COLOR_DI="0;34"  # di:directory
-  K_COLOR_LN="0;35"  # ln:symlink
-  K_COLOR_SO="0;32"  # so:socket
-  K_COLOR_PI="0;33"  # pi:pipe
-  K_COLOR_EX="0;31"  # ex:executable
-  K_COLOR_BD="34;46" # bd:block special
-  K_COLOR_CD="34;43" # cd:character special
-  K_COLOR_SU="30;41" # su:executable with setuid bit set
-  K_COLOR_SG="30;46" # sg:executable with setgid bit set
-  K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
-  K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
-  K_COLOR_BR="0;30"  # branch
+  typeset -g K_COLOR_DI="0;34"  # di:directory
+  typeset -g K_COLOR_LN="0;35"  # ln:symlink
+  typeset -g K_COLOR_SO="0;32"  # so:socket
+  typeset -g K_COLOR_PI="0;33"  # pi:pipe
+  typeset -g K_COLOR_EX="0;31"  # ex:executable
+  typeset -g K_COLOR_BD="34;46" # bd:block special
+  typeset -g K_COLOR_CD="34;43" # cd:character special
+  typeset -g K_COLOR_SU="30;41" # su:executable with setuid bit set
+  typeset -g K_COLOR_SG="30;46" # sg:executable with setgid bit set
+  typeset -g K_COLOR_TW="30;42" # tw:directory writable to others, with sticky bit
+  typeset -g K_COLOR_OW="30;43" # ow:directory writable to others, without sticky bit
+  typeset -g K_COLOR_BR="0;30"  # branch
 
   # read colors if osx and $LSCOLORS is defined
   if [[ $(uname) == 'Darwin' && -n $LSCOLORS ]]; then
     # Translate OSX/BSD's LSCOLORS so we can use the same here
-    K_COLOR_DI=$(_k_bsd_to_ansi $LSCOLORS[1]  $LSCOLORS[2])
-    K_COLOR_LN=$(_k_bsd_to_ansi $LSCOLORS[3]  $LSCOLORS[4])
-    K_COLOR_SO=$(_k_bsd_to_ansi $LSCOLORS[5]  $LSCOLORS[6])
-    K_COLOR_PI=$(_k_bsd_to_ansi $LSCOLORS[7]  $LSCOLORS[8])
-    K_COLOR_EX=$(_k_bsd_to_ansi $LSCOLORS[9]  $LSCOLORS[10])
-    K_COLOR_BD=$(_k_bsd_to_ansi $LSCOLORS[11] $LSCOLORS[12])
-    K_COLOR_CD=$(_k_bsd_to_ansi $LSCOLORS[13] $LSCOLORS[14])
-    K_COLOR_SU=$(_k_bsd_to_ansi $LSCOLORS[15] $LSCOLORS[16])
-    K_COLOR_SG=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
-    K_COLOR_TW=$(_k_bsd_to_ansi $LSCOLORS[19] $LSCOLORS[20])
-    K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[21] $LSCOLORS[22])
+    typeset -g K_COLOR_DI=$(_k_bsd_to_ansi $LSCOLORS[1]  $LSCOLORS[2])
+    typeset -g K_COLOR_LN=$(_k_bsd_to_ansi $LSCOLORS[3]  $LSCOLORS[4])
+    typeset -g K_COLOR_SO=$(_k_bsd_to_ansi $LSCOLORS[5]  $LSCOLORS[6])
+    typeset -g K_COLOR_PI=$(_k_bsd_to_ansi $LSCOLORS[7]  $LSCOLORS[8])
+    typeset -g K_COLOR_EX=$(_k_bsd_to_ansi $LSCOLORS[9]  $LSCOLORS[10])
+    typeset -g K_COLOR_BD=$(_k_bsd_to_ansi $LSCOLORS[11] $LSCOLORS[12])
+    typeset -g K_COLOR_CD=$(_k_bsd_to_ansi $LSCOLORS[13] $LSCOLORS[14])
+    typeset -g K_COLOR_SU=$(_k_bsd_to_ansi $LSCOLORS[15] $LSCOLORS[16])
+    typeset -g K_COLOR_SG=$(_k_bsd_to_ansi $LSCOLORS[17] $LSCOLORS[18])
+    typeset -g K_COLOR_TW=$(_k_bsd_to_ansi $LSCOLORS[19] $LSCOLORS[20])
+    typeset -g K_COLOR_OW=$(_k_bsd_to_ansi $LSCOLORS[21] $LSCOLORS[22])
   fi
 
   # read colors if linux and $LS_COLORS is defined
