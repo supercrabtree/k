@@ -169,9 +169,46 @@ k () {
   fi
 
   # read colors if linux and $LS_COLORS is defined
-  # if [[ $(uname) == 'Linux' && -n $LS_COLORS ]]; then
-
-  # fi
+  if [[ $(uname) == 'Linux' && -n $LS_COLORS ]]; then
+    for val in $(echo $LS_COLORS | awk 'BEGIN {RS=":"} {print $1}'); do
+      IFS='=' read -r -A array <<< "$val"
+      case ${array[1]} in
+        di)
+          K_COLOR_DI="${array[2]}"
+          ;;
+        ln)
+          K_COLOR_LN="${array[2]}"
+          ;;
+        so)
+          K_COLOR_SO="${array[2]}"
+          ;;
+        pi)
+          K_COLOR_PI="${array[2]}"
+          ;;
+        ex)
+          K_COLOR_EX="${array[2]}"
+          ;;
+        bd)
+          K_COLOR_BD="${array[2]}"
+          ;;
+        cd)
+          K_COLOR_CD="${array[2]}"
+          ;;
+        su)
+          K_COLOR_SU="${array[2]}"
+          ;;
+        sg)
+          K_COLOR_SG="${array[2]}"
+          ;;
+        tw)
+          K_COLOR_TW="${array[2]}"
+          ;;
+        ow)
+          K_COLOR_OW="${array[2]}"
+          ;;
+      esac
+    done
+  fi
 
   # ----------------------------------------------------------------------------
   # Loop over passed directories and files to display
