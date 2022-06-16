@@ -72,6 +72,14 @@ Then load as a plugin in your `.zshrc`
 plugins+=(k)
 ```
 
+### Using [Fig](https://fig.io)
+
+Fig adds apps, shortcuts, and autocomplete to your existing terminal.
+
+Install `k` in just one click.
+
+<a href="https://fig.io/plugins/other/k" target="_blank"><img src="https://fig.io/badges/install-with-fig.svg" /></a>
+
 ### Manually
 Clone this repository somewhere (~/k for example)
 
