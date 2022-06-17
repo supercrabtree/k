@@ -76,7 +76,7 @@ plugins+=(k)
 Clone this repository somewhere (~/k for example)
 
 ```shell
-git clone git@github.com:supercrabtree/k.git $HOME/k
+git clone https://github.com/supercrabtree/k.git $HOME/k
 ```
 Source the script
 
