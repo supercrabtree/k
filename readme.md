@@ -66,10 +66,10 @@ Clone k into your custom plugins repo
 ```shell
 git clone https://github.com/supercrabtree/k $ZSH_CUSTOM/plugins/k
 ```
-Then load as a plugin in your `.zshrc`
+Then load as a plugin in your `.zshrc`. If `plugins` is where it usually is:
 
 ```shell
-plugins+=(k)
+sed -i 's/^plugins=(/plugins=(k /g' $HOME/.zshrc
 ```
 
 ### Manually
